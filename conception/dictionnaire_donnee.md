@@ -39,4 +39,4 @@
 | --------------- |---------------| -----| -----|-----|
 | id                |    uuid     |  Identification unique | PK   |  e582aa43347a4e7fa994510fdd0ad486|
 | quantite commandé | string         |    Quantité commandé| >1, non nul| 2|
-| prix_unitaire | float       |    prix unitaire de l'article à la date de commande | > 0, non null, décimal (8,2) | 12.5|
+| prix_unitaire | float       |     prix unitaire de l'article à la date de commande | > 0, non null, décimal (8,2) | 12.5|
