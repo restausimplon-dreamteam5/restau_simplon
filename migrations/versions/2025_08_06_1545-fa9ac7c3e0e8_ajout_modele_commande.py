@@ -27,11 +27,10 @@ def upgrade() -> None:
     sa.Column('status', sa.Enum('pending', 'confirmed', 'completed', 'cancelled', name='orderstatus'), nullable=False),
     sa.Column('order_date', sa.DateTime(), nullable=False),
     sa.Column('user_id', sa.Uuid(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['user_info.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['user_id'], ['user_info.id'], name='fk_order_user_info'),
+    sa.PrimaryKeyConstraint('id', name='pk_order'),
     )
     # ### end Alembic commands ###
-
 
 def downgrade() -> None:
     """Downgrade schema."""
