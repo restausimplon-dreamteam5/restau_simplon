@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, status
 from typing import Annotated
 from sqlmodel import select
 from app.schemas.schemas import MenuItemCreate, MenuItemOut
@@ -105,7 +105,9 @@ def read_menu_item(menu_item_name: str, session: SessionDep) -> MenuItemOut:
         select(MenuItem).where(MenuItem.name == menu_item_name)
     ).first()
     if not menu_item_db:
-        raise HTTPException(status_code=404, detail="Menu item not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Menu item not found"
+        )
     menu_item_out = MenuItemOut(
         id=menu_item_db.id,
         name=menu_item_db.name,
@@ -136,7 +138,9 @@ def delete_menu_item(menu_item_name: str, session: SessionDep) -> bool:
         select(MenuItem).where(MenuItem.name == menu_item_name)
     ).first()
     if not menu_item_db:
-        raise HTTPException(status_code=404, detail="Menu item not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Menu item not found"
+        )
     session.delete(menu_item_db)
     session.commit()
     return True
