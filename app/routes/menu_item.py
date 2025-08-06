@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Query, status
 from typing import Annotated
+from decimal import Decimal
 from sqlmodel import select
-from app.schemas.schemas import MenuItemCreate, MenuItemOut
-from app.models.models import MenuItem
+from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate
+from app.models.models import MenuItem, MenuCategory
 from app.deps import SessionDep
 
 router = APIRouter(prefix="/menu_items", tags=["Menu items"])
@@ -11,6 +12,7 @@ router = APIRouter(prefix="/menu_items", tags=["Menu items"])
 @router.post("/")
 def create_menu_item(menu_item: MenuItemCreate, session: SessionDep) -> MenuItemOut:
     """**Ajout d'un article de menu dans la base de donnée.**
+
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemCreate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
@@ -108,6 +110,110 @@ def read_menu_item(menu_item_name: str, session: SessionDep) -> MenuItemOut:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Menu item not found"
         )
+    menu_item_out = MenuItemOut(
+        id=menu_item_db.id,
+        name=menu_item_db.name,
+        price=menu_item_db.price,
+        category=menu_item_db.category,
+        description=menu_item_db.description,
+        stock=menu_item_db.stock,
+    )
+    return menu_item_out
+
+
+@router.patch("/{menu_item_name}")
+def partial_update_menu_item(
+    menu_item_name: str, new_menu_item: MenuItemUpdate, session: SessionDep
+) -> MenuItemOut:
+    """**Mise à jour partielle de l'article de menu**, dont le nom est **menu_item_name**
+
+    * Validation des données entrantes grâce au schéma Pydantic **MenuItemUpdate**
+    * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Args**:
+    * **menu_item_name** (*str*): Le nom de l'article
+    * **new_menu_item** (*MenuItemUpdate*): Les informations entrantes
+    * **session** (*SessionDep*): La session communicante avec la BDD
+
+    **Raises**:
+    * *HTTPException*: Article de menu introuvable
+
+    **Returns**:
+    * (*MenuItemOut*): Les informations sortantes
+    """
+
+    menu_item_db = session.exec(
+        select(MenuItem).where(MenuItem.name == menu_item_name)
+    ).first()
+    if not menu_item_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Menu item not found"
+        )
+
+    if new_menu_item.name:
+        menu_item_db.name = new_menu_item.name
+    if new_menu_item.price:
+        menu_item_db.price = new_menu_item.price
+    if new_menu_item.category:
+        menu_item_db.category = new_menu_item.category
+    if new_menu_item.description:
+        menu_item_db.description = new_menu_item.description
+    if new_menu_item.stock:
+        menu_item_db.stock = new_menu_item.stock
+
+    session.add(menu_item_db)
+    session.commit()
+    session.refresh(menu_item_db)
+
+    menu_item_out = MenuItemOut(
+        id=menu_item_db.id,
+        name=menu_item_db.name,
+        price=menu_item_db.price,
+        category=menu_item_db.category,
+        description=menu_item_db.description,
+        stock=menu_item_db.stock,
+    )
+    return menu_item_out
+
+
+@router.put("/{menu_item_name}")
+def update_menu_item(
+    menu_item_name: str, new_menu_item: MenuItemCreate, session: SessionDep
+) -> MenuItemOut:
+    """**Mise à jour complète de l'article de menu**, dont le nom est **menu_item_name**
+
+    * Validation des données entrantes grâce au schéma Pydantic **MenuItemCreate**
+    * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Args**:
+    * **menu_item_name** (*str*): Le nom de l'article
+    * **new_menu_item** (*MenuItemCreate*): Les informations entrantes
+    * **session** (*SessionDep*): La session communicante avec la BDD
+
+    **Raises**:
+    * *HTTPException*: Article de menu introuvable
+
+    **Returns**:
+    * (*MenuItemOut*): Les informations sortantes
+    """
+
+    menu_item_db = session.exec(
+        select(MenuItem).where(MenuItem.name == menu_item_name)
+    ).first()
+    if not menu_item_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Menu item not found"
+        )
+    menu_item_db.name = new_menu_item.name
+    menu_item_db.price = new_menu_item.price
+    menu_item_db.category = new_menu_item.category
+    menu_item_db.description = new_menu_item.description
+    menu_item_db.stock = new_menu_item.stock
+
+    session.add(menu_item_db)
+    session.commit()
+    session.refresh(menu_item_db)
+
     menu_item_out = MenuItemOut(
         id=menu_item_db.id,
         name=menu_item_db.name,
