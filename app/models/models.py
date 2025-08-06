@@ -5,6 +5,7 @@ from decimal import Decimal
 from enum import Enum
 from datetime import datetime
 
+
 # User
 class User(SQLModel, table=True):
     __tablename__ = "user_info"
