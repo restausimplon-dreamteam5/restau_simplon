@@ -17,8 +17,8 @@
 | --------------- |---------------| -----| -----|-----|
 | id                |    uuid     |  Identification unique | PK   |  e582aa43347a4e7fa994510fdd0ad486 |
 | role  | string          |    Role de l'utilisateur | Enum (admin, employe, client) | admin |
-## Entité : article
 
+## Entité : article
 | Champ            | Type          | Description|  Contraintes|  Exemple |
 | --------------- |---------------| -----| -----|-----|
 | id                |    uuid     |  Identification unique | PK   |  e582aa43347a4e7fa994510fdd0ad486 |
