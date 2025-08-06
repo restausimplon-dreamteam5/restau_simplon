@@ -16,7 +16,6 @@ class User(SQLModel, table=True):
     email: str = Field(index=True)
     password: str
     created_at: datetime = Field(default_factory=datetime.now)
-    __tablename__ = "user_info"
 
 
 # Article
