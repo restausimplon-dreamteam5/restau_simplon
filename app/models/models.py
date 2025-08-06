@@ -4,6 +4,7 @@ from sqlmodel import Field, SQLModel, Column, Enum as smEnum
 from decimal import Decimal
 from enum import Enum
 from datetime import datetime
+from pydantic import EmailStr
 
 
 # User
@@ -13,9 +14,11 @@ class User(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     first_name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
-    phone: str
-    address: str | None
-    email: str = Field(index=True)
+    phone: str = Field(
+        min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
+    )
+    address: str | None = Field(max_length=200)
+    email: EmailStr = Field(index=True, unique=True, max_length=320)
     password: str
     created_at: datetime = Field(default_factory=datetime.now)
 
@@ -51,10 +54,12 @@ class MenuItem(SQLModel, table=True):
 # Commande
 class OrderStatus(str, Enum):
     "Énumération des statuts de commande"
+
     pending = "pending"
     confirmed = "confirmed"
     completed = "completed"
     cancelled = "cancelled"
+
 
 class Order(SQLModel, table=True):
     """Modèle de commande pour la base de données"""
@@ -66,5 +71,3 @@ class Order(SQLModel, table=True):
     order_date: datetime = Field(default_factory=datetime.now)
 
     user_id: uuid.UUID = Field(foreign_key="user_info.id")
-
-
