@@ -47,5 +47,4 @@ class MenuItem(SQLModel, table=True):
     description: str | None = Field(None)
     stock: int = Field(default=0, ge=0)
 
-
 # Order
