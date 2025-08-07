@@ -8,6 +8,7 @@ from app.models.models import User
 from app.schemas.schemas import Token, TokenData
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
+import bcrypt
 
 router = APIRouter(prefix="/login", tags=["Login"])
 
@@ -19,6 +20,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
 
 def extract_data_from_token(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
@@ -42,15 +44,20 @@ def extract_data_from_token(token: Annotated[str, Depends(oauth2_scheme)]):
 def get_token_data(token_data: Annotated[TokenData, Depends(extract_data_from_token)]):
     return token_data
 
+
 @router.post("/")
 def login(
     logins: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep
 ) -> Token:
-    hashed_password = logins.password  # TODO: hashé et salé le mdp
+    hashed_password = bcrypt.hashpw(logins.password.encode(), bcrypt.gensalt())
+    print(
+        f"{logins.password} --- {hashed_password.decode('utf-8')}"
+    )  # TODO: A supprimer: verif mdp hashé et salé
+
     user = session.exec(
         select(User)
         .where(User.email == logins.username)
-        .where(User.password == hashed_password)
+        .where(User.password == hashed_password.decode("utf-8"))
     ).one()
     if not user:
         raise HTTPException(
@@ -71,4 +78,3 @@ def login(
     encoded_jwt = jwt.encode(access_token, SECRET_KEY, algorithm=ALGORITHM)
 
     return Token(access_token=encoded_jwt, token_type="bearer")
-
