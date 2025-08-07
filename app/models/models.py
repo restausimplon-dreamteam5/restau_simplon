@@ -14,9 +14,17 @@ class User(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     first_name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
+    # On a choisi de prendre en charges les numéro de type "0677889910". 
+    # Pas d'espaces, pas prefix comme +33
+    # Que des numeros français de 10 caractères
+    # TODO: on pourrait verifier les prefix valables 06, 07, 01, 02, 03, 04,05 ...
+    # TODO: regarder du côté de pydantic
+    # THINK: Est ce que le pattern à besoin d'être la ? 
+    # Il devrait être dans le schema d'entré. mais dans la db peut être pas
     phone: str = Field(
         min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
     )
+    # Adresse complète comme (46 rue des michels 44000 Nantes)
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(index=True, unique=True, max_length=320)
     password: str
