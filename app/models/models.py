@@ -47,4 +47,41 @@ class MenuItem(SQLModel, table=True):
     description: str | None = Field(None)
     stock: int = Field(default=0, ge=0)
 
-# Order
+
+# Commande
+class OrderStatus(str, Enum):
+    "Énumération des statuts de commande"
+
+    pending = "pending"
+    confirmed = "confirmed"
+    completed = "completed"
+    cancelled = "cancelled"
+
+
+class Order(SQLModel, table=True):
+    """Modèle de commande pour la base de données"""
+
+    __tablename__ = "order"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    status: OrderStatus = Field(default=OrderStatus.pending)
+    order_date: datetime = Field(default_factory=datetime.now)
+
+    user_id: uuid.UUID = Field(foreign_key="user_info.id")
+
+# Detail commande 
+class OrderDetail(SQLModel, table=True):
+    """Modèle de détail de commande pour la base de données"""
+
+    __tablename__ = "order_detail"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+   
+    order_id: uuid.UUID = Field(foreign_key="order.id")
+    item_id: uuid.UUID = Field(foreign_key="menu_item.id")
+    
+    quantity: int = Field(gt=0, default=1)
+    unit_price: Decimal = Field(..., max_digits=8, decimal_places=2) 
+  
+
+
