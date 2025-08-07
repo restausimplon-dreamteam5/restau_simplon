@@ -4,7 +4,7 @@ import uuid
 from decimal import Decimal
 
 from pydantic import EmailStr
-from app.models.models import MenuCategory
+from app.models.models import MenuCategory, Role
 from sqlmodel import SQLModel, Field
 from uuid import UUID
 from datetime import datetime
@@ -69,7 +69,11 @@ class UserOut(SQLModel):
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(max_length=320)
     created_at: datetime
-
+    roles: list[Role]
+    
+class Token(SQLModel):
+    access_token: str
+    token_type: str
 
 # Article
 class MenuItemCreate(SQLModel):

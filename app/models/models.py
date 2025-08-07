@@ -15,7 +15,7 @@ class Permission(SQLModel, table=True):
 
 class Role(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    role: str
+    role: str = Field(unique=True)
 
 
 class User(SQLModel, table=True):
