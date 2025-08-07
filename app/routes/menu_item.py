@@ -86,6 +86,53 @@ def read_menu_items(
     return menu_items_out
 
 
+@router.get("/category/{menu_category}")
+def read_menu_category(menu_category: str, session: SessionDep) -> list[MenuItemOut]:
+    """**Récupération des articles de menu**, dont la catégorie est **menu_category**
+
+    * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Args**:
+    * **menu_category** (*str*): La catégorie d'articles de menu
+    * **session** (*SessionDep*): La session communicante avec la BDD
+
+    **Raises**:
+    * *HTTPException*: Catégorie de menu inexistante
+
+    **Returns**:
+    * (*list[MenuItemOut]*): Liste des informations sortantes
+    """
+
+    if menu_category in MenuCategory:
+        menu_items_db = session.exec(
+            select(MenuItem).where(MenuItem.category == menu_category)
+        ).all()
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"La catégorie {menu_category} n'existe pas dans l'énumération de catégorie",
+        )
+
+    if not menu_items_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No menu items found"
+        )
+
+    menu_items_out = [
+        MenuItemOut(
+            id=menu_item_db.id,
+            name=menu_item_db.name,
+            price=menu_item_db.price,
+            category=menu_item_db.category,
+            description=menu_item_db.description,
+            stock=menu_item_db.stock,
+        )
+        for menu_item_db in menu_items_db
+    ]
+
+    return menu_items_out
+
+
 @router.get("/{menu_item_name}")
 def read_menu_item(menu_item_name: str, session: SessionDep) -> MenuItemOut:
     """**Récupération de l'article de menu**, dont le nom est **menu_item_name**
