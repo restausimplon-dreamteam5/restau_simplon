@@ -109,13 +109,11 @@ class OrderDetailCreate(SQLModel):
     item_id: UUID
     quantity: int = Field(default=1, gt=0)
 
-# Commande
-class OrderCreate(SQLModel):
-    """Schéma pour créer une commande"""
-
-    user_id: UUID
-    order_date: datetime = Field(default_factory=datetime.now)
-    items: List[OrderDetailCreate]
+class OrderDetailOut(SQLModel):
+    """Schéma de sortie pour un article dans une commande"""
+    item_id: UUID
+    quantity: int
+    unit_price: Decimal
 
 class OrderOut(SQLModel):
     """Schéma de sortie pour une commande
@@ -128,6 +126,17 @@ class OrderOut(SQLModel):
     status: OrderStatus
     total_amount: Decimal 
 
+class OrderWithDetailsOut(OrderOut):
+    items: list[OrderDetailOut]
+
+# Commande
+class OrderCreate(SQLModel):
+    """Schéma pour créer une commande"""
+
+    user_id: UUID
+    order_date: datetime = Field(default_factory=datetime.now)
+    items: List[OrderDetailCreate]
+
 class OrderStatusUpdate(SQLModel):
     """Schéma pour mettre à jour le statut d'une commande
        Permet de changer le statut d'une commande existante
@@ -135,7 +144,7 @@ class OrderStatusUpdate(SQLModel):
 
     new_status: OrderStatus
     
-    
+
     
 
 
