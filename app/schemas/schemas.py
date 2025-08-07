@@ -3,6 +3,11 @@ import uuid
 from decimal import Decimal
 from app.models.models import MenuCategory
 from sqlmodel import SQLModel, Field
+from uuid import UUID
+from datetime import datetime
+from typing import List
+from app.models.models import OrderStatus
+
 
 
 # User
@@ -39,5 +44,42 @@ class MenuItemOut(SQLModel):
     description: str | None = None
     stock: int
 
+# Detail commande
+class OrderDetailCreate(SQLModel):
+    """Schéma d’entrée pour un article dans une commande"""
 
-# Order
+    item_id: UUID
+    quantity: int = Field(default=1, gt=0)
+
+# Commande
+class OrderCreate(SQLModel):
+    """Schéma pour créer une commande"""
+
+    user_id: UUID
+    order_date: datetime = Field(default_factory=datetime.now)
+    items: List[OrderDetailCreate]
+
+class OrderOut(SQLModel):
+    """Schéma de sortie pour une commande
+       Contient les informations de la commande une fois créée ou consultée
+    """
+
+    id: UUID
+    user_id: UUID
+    order_date: datetime
+    status: OrderStatus
+    total_amount: Decimal 
+
+class OrderStatusUpdate(SQLModel):
+    """Schéma pour mettre à jour le statut d'une commande
+       Permet de changer le statut d'une commande existante
+    """
+
+    new_status: OrderStatus
+    
+    
+    
+
+
+
+
