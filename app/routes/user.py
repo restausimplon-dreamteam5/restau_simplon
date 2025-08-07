@@ -78,3 +78,11 @@ def update_user(id: uuid.UUID, new_user: UserPost, session: SessionDep) -> UserO
     session.add(user_db)  # TODO: email unique exception
     session.commit()
     return user_db
+
+
+@router.delete("/{id}")
+def delete_user(id: uuid.UUID, session: SessionDep) -> bool:
+    user_to_delete = session.exec(select(User).where(User.id == id)).one()
+    session.delete(user_to_delete)
+    session.commit()
+    return True # TODO: meilleur retour
