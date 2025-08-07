@@ -1,15 +1,15 @@
 # Import
 import uuid
-from pydantic import BaseModel, Field
 from decimal import Decimal
 from app.models.models import MenuCategory
+from sqlmodel import SQLModel, Field
 
 
 # User
 
 
 # Article
-class MenuItemCreate(BaseModel):
+class MenuItemCreate(SQLModel):
     """Modèle de création d'article de menu"""
 
     name: str = Field(max_length=100)
@@ -19,7 +19,7 @@ class MenuItemCreate(BaseModel):
     stock: int = Field(default=0, ge=0)
 
 
-class MenuItemUpdate(BaseModel):
+class MenuItemUpdate(SQLModel):
     """Modèle de mise à jour d'article de menu"""
 
     name: str | None = Field(default=None, max_length=100)
@@ -29,7 +29,7 @@ class MenuItemUpdate(BaseModel):
     stock: int | None = Field(default=None, ge=0)
 
 
-class MenuItemOut(BaseModel):
+class MenuItemOut(SQLModel):
     """Modèle de création d'article de menu"""
 
     id: uuid.UUID
