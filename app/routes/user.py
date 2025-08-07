@@ -2,7 +2,7 @@ from typing import Annotated
 import uuid
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import select
-from app.schemas.schemas import UserCreate, UserOut
+from app.schemas.schemas import UserCreate, UserOut, UserPatch, UserPost
 from app.models.models import User
 from app.deps import SessionDep
 
@@ -17,9 +17,11 @@ def get_all_users(
     users = session.exec(select(User).offset(offset).limit(limit))
     return users
 
+
 @router.get("/{id}")
 def get_user_by_id(id: uuid.UUID, session: SessionDep) -> UserOut:
-    return session.exec(select(User).where(User.id==id)).one()
+    return session.exec(select(User).where(User.id == id)).one()
+
 
 @router.post("/")
 def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
@@ -29,10 +31,50 @@ def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
         phone=new_user.phone,
         address=new_user.address,
         email=new_user.email,
-        password=new_user.password,  # TODO: hash and salt password
+        password=new_user.password,  # TODO: hashé et salé le mdp
     )
     session.add(user_db)
     session.commit()
     print(user_db)
     return user_db
 
+
+@router.patch("/{id}")
+def partial_update_user(
+    id: uuid.UUID, new_user: UserPatch, session: SessionDep
+) -> UserOut:
+    user_db = session.exec(select(User).where(User.id == id)).one()
+
+    if new_user.first_name:
+        user_db.first_name = new_user.first_name
+    if new_user.surname:
+        user_db.surname = new_user.surname
+    if new_user.email:
+        user_db.email = new_user.email
+    if new_user.phone:
+        user_db.phone = new_user.phone
+    if new_user.address:
+        user_db.address = new_user.address
+    if new_user.password:  # TODO: hashé et salé le mdp
+        user_db.password = new_user.password
+
+    session.add(user_db)  # TODO: email unique exception
+    session.commit()
+    return user_db
+
+
+@router.put("/{id}")
+def update_user(id: uuid.UUID, new_user: UserPost, session: SessionDep) -> UserOut:
+    user_db = session.exec(select(User).where(User.id == id)).one()
+
+    user_db.first_name = new_user.first_name
+    user_db.surname = new_user.surname
+    user_db.email = new_user.email
+    user_db.phone = new_user.phone
+    user_db.password = new_user.password  # TODO: hashé et salé le mdp
+    if new_user.address:
+        user_db.address = new_user.address
+
+    session.add(user_db)  # TODO: email unique exception
+    session.commit()
+    return user_db
