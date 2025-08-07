@@ -1,6 +1,9 @@
 # Import
+from datetime import datetime
 import uuid
 from decimal import Decimal
+
+from pydantic import EmailStr
 from app.models.models import MenuCategory
 from sqlmodel import SQLModel, Field
 from uuid import UUID
@@ -11,6 +14,61 @@ from app.models.models import OrderStatus
 
 
 # User
+# TODO: find out about doc
+class UserCreate(SQLModel):
+    first_name: str = Field(max_length=50)
+    surname: str = Field(max_length=50)
+    phone: str = Field(
+        min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
+    )
+    # Adresse complète comme (46 rue des michels 44000 Nantes)
+    address: str | None = Field(max_length=200)
+    email: EmailStr = Field(max_length=320)
+    password: str
+
+
+class UserPatch(SQLModel):
+    first_name: str | None = Field(default=None, max_length=50)
+    surname: str | None = Field(default=None, max_length=50)
+    phone: str | None = Field(
+        default=None,
+        min_length=10,
+        max_length=10,
+        schema_extra={"pattern": r"^[0-9]*$"},
+    )
+    # Adresse complète comme (46 rue des michels 44000 Nantes)
+    address: str | None = Field(default=None, max_length=200)
+    email: EmailStr | None = Field(default=None, max_length=320)
+    password: str | None = None
+
+
+class UserPost(SQLModel):
+    first_name: str = Field(max_length=50)
+    surname: str = Field(max_length=50)
+    phone: str = Field(
+        min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
+    )
+    # Adresse complète comme (46 rue des michels 44000 Nantes)
+    address: str | None = Field(max_length=200)
+    email: EmailStr = Field(max_length=320)
+    password: str
+
+
+class UserOut(SQLModel):
+    """
+    Téléphone: numéro de type "0677889910". Pas d'espaces, pas prefix national (+33). Juste 10 numero.
+    Adresse: Adresse complète (ex: 46 rue des michels 44000 Nantes)
+    """
+
+    id: uuid.UUID
+    first_name: str = Field(max_length=50)
+    surname: str = Field(max_length=50)
+    phone: str = Field(
+        min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
+    )
+    address: str | None = Field(max_length=200)
+    email: EmailStr = Field(max_length=320)
+    created_at: datetime
 
 
 # Article
