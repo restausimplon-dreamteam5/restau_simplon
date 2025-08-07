@@ -1,0 +1,702 @@
+[
+  {
+    "name": "Bruschetta",
+    "category": "starter",
+    "price": 7.23,
+    "description": "Toasted bread with tomato and basil",
+    "stock": 46
+  },
+  {
+    "name": "Caesar Salad",
+    "category": "starter",
+    "price": 9.89,
+    "description": "Romaine lettuce with Caesar dressing and croutons",
+    "stock": 36
+  },
+  {
+    "name": "French Onion Soup",
+    "category": "starter",
+    "price": 9.22,
+    "description": "Rich beef broth with caramelized onions and cheese toast",
+    "stock": 28
+  },
+  {
+    "name": "Spring Rolls",
+    "category": "starter",
+    "price": 11.95,
+    "description": "Crispy rolls filled with vegetables and glass noodles",
+    "stock": 43
+  },
+  {
+    "name": "Garlic Bread",
+    "category": "starter",
+    "price": 5.69,
+    "description": "Oven-baked bread with garlic butter and herbs",
+    "stock": 10
+  },
+  {
+    "name": "Caprese Salad",
+    "category": "starter",
+    "price": 6.5,
+    "description": "Tomatoes, mozzarella, and basil drizzled with olive oil",
+    "stock": 47
+  },
+  {
+    "name": "Stuffed Mushrooms",
+    "category": "starter",
+    "price": 11.58,
+    "description": "Mushroom caps filled with cheese and herbs",
+    "stock": 8
+  },
+  {
+    "name": "Deviled Eggs",
+    "category": "starter",
+    "price": 10.55,
+    "description": "Hard-boiled eggs with a creamy mustard filling",
+    "stock": 30
+  },
+  {
+    "name": "Mini Quiches",
+    "category": "starter",
+    "price": 6.25,
+    "description": "Savory tartlets with cheese and vegetables",
+    "stock": 47
+  },
+  {
+    "name": "Shrimp Cocktail",
+    "category": "starter",
+    "price": 9.97,
+    "description": "Chilled shrimp served with tangy cocktail sauce",
+    "stock": 39
+  },
+  {
+    "name": "Grilled Salmon",
+    "category": "main course",
+    "price": 21.79,
+    "description": "Fresh salmon fillet grilled to perfection with lemon",
+    "stock": 6
+  },
+  {
+    "name": "Spaghetti Bolognese",
+    "category": "main course",
+    "price": 18.92,
+    "description": "Classic pasta with a rich meat sauce",
+    "stock": 26
+  },
+  {
+    "name": "Chicken Tikka Masala",
+    "category": "main course",
+    "price": 20.92,
+    "description": "Chicken in a creamy tomato and spice sauce",
+    "stock": 25
+  },
+  {
+    "name": "Beef Stroganoff",
+    "category": "main course",
+    "price": 17.22,
+    "description": "Tender beef strips in a creamy mushroom sauce",
+    "stock": 24
+  },
+  {
+    "name": "Vegetable Stir Fry",
+    "category": "main course",
+    "price": 18.23,
+    "description": "Mixed vegetables stir-fried in a savory sauce",
+    "stock": 16
+  },
+  {
+    "name": "Margherita Pizza",
+    "category": "main course",
+    "price": 20.62,
+    "description": "Pizza with tomato, mozzarella, and basil",
+    "stock": 39
+  },
+  {
+    "name": "Lasagna",
+    "category": "main course",
+    "price": 13.49,
+    "description": "Layered pasta with meat, cheese, and tomato sauce",
+    "stock": 21
+  },
+  {
+    "name": "Lamb Chops",
+    "category": "main course",
+    "price": 15.18,
+    "description": "Grilled lamb chops with rosemary and garlic",
+    "stock": 49
+  },
+  {
+    "name": "Stuffed Peppers",
+    "category": "main course",
+    "price": 18.17,
+    "description": "Bell peppers stuffed with rice and vegetables",
+    "stock": 46
+  },
+  {
+    "name": "Duck Confit",
+    "category": "main course",
+    "price": 13.83,
+    "description": "Slow-cooked duck leg with crispy skin",
+    "stock": 23
+  },
+  {
+    "name": "Chocolate Brownie",
+    "category": "dessert",
+    "price": 13.87,
+    "description": "A delicious brownie intense in chocolate with pecan peanuts inside",
+    "stock": 33
+  },
+  {
+    "name": "Tiramisu",
+    "category": "dessert",
+    "price": 9.27,
+    "description": "Coffee-flavored Italian dessert with mascarpone",
+    "stock": 27
+  },
+  {
+    "name": "Apple Pie",
+    "category": "dessert",
+    "price": 10.39,
+    "description": "Traditional pie with spiced apple filling",
+    "stock": 35
+  },
+  {
+    "name": "Lemon Tart",
+    "category": "dessert",
+    "price": 11.29,
+    "description": "Tangy lemon curd in a buttery crust",
+    "stock": 9
+  },
+  {
+    "name": "Cheesecake",
+    "category": "dessert",
+    "price": 14.76,
+    "description": "Creamy cheesecake with a graham cracker crust",
+    "stock": 14
+  },
+  {
+    "name": "Ice Cream Sundae",
+    "category": "dessert",
+    "price": 13.53,
+    "description": "Vanilla ice cream with chocolate sauce and nuts",
+    "stock": 6
+  },
+  {
+    "name": "Panna Cotta",
+    "category": "dessert",
+    "price": 11.08,
+    "description": "Creamy dessert topped with berry coulis",
+    "stock": 12
+  },
+  {
+    "name": "Cr\u00e8me Br\u00fbl\u00e9e",
+    "category": "dessert",
+    "price": 9.46,
+    "description": "Rich custard with a caramelized sugar crust",
+    "stock": 37
+  },
+  {
+    "name": "Fruit Salad",
+    "category": "dessert",
+    "price": 14.84,
+    "description": "Fresh seasonal fruits tossed together",
+    "stock": 36
+  },
+  {
+    "name": "Chocolate Mousse",
+    "category": "dessert",
+    "price": 13.77,
+    "description": "Light and airy chocolate dessert",
+    "stock": 14
+  },
+  {
+    "name": "Lemon Tart 2",
+    "category": "dessert",
+    "price": 11.23,
+    "description": "Tangy lemon curd in a buttery crust",
+    "stock": 11
+  },
+  {
+    "name": "Ice Cream Sundae 2",
+    "category": "dessert",
+    "price": 14.47,
+    "description": "Vanilla ice cream with chocolate sauce and nuts",
+    "stock": 30
+  },
+  {
+    "name": "Spring Rolls 2",
+    "category": "starter",
+    "price": 5.67,
+    "description": "Crispy rolls filled with vegetables and glass noodles",
+    "stock": 20
+  },
+  {
+    "name": "Margherita Pizza 2",
+    "category": "main course",
+    "price": 22.36,
+    "description": "Pizza with tomato, mozzarella, and basil",
+    "stock": 18
+  },
+  {
+    "name": "Panna Cotta 2",
+    "category": "dessert",
+    "price": 5.2,
+    "description": "Creamy dessert topped with berry coulis",
+    "stock": 10
+  },
+  {
+    "name": "Deviled Eggs 2",
+    "category": "starter",
+    "price": 10.54,
+    "description": "Hard-boiled eggs with a creamy mustard filling",
+    "stock": 27
+  },
+  {
+    "name": "Cr\u00e8me Br\u00fbl\u00e9e 2",
+    "category": "dessert",
+    "price": 11.68,
+    "description": "Rich custard with a caramelized sugar crust",
+    "stock": 26
+  },
+  {
+    "name": "Caprese Salad 2",
+    "category": "starter",
+    "price": 7.62,
+    "description": "Tomatoes, mozzarella, and basil drizzled with olive oil",
+    "stock": 15
+  },
+  {
+    "name": "Caesar Salad 2",
+    "category": "starter",
+    "price": 8.52,
+    "description": "Romaine lettuce with Caesar dressing and croutons",
+    "stock": 37
+  },
+  {
+    "name": "Deviled Eggs 3",
+    "category": "starter",
+    "price": 6.8,
+    "description": "Hard-boiled eggs with a creamy mustard filling",
+    "stock": 33
+  },
+  {
+    "name": "Panna Cotta 3",
+    "category": "dessert",
+    "price": 10.37,
+    "description": "Creamy dessert topped with berry coulis",
+    "stock": 1
+  },
+  {
+    "name": "Bruschetta 2",
+    "category": "starter",
+    "price": 5.45,
+    "description": "Toasted bread with tomato and basil",
+    "stock": 10
+  },
+  {
+    "name": "Duck Confit 2",
+    "category": "main course",
+    "price": 17.76,
+    "description": "Slow-cooked duck leg with crispy skin",
+    "stock": 39
+  },
+  {
+    "name": "Mini Quiches 2",
+    "category": "starter",
+    "price": 11.07,
+    "description": "Savory tartlets with cheese and vegetables",
+    "stock": 19
+  },
+  {
+    "name": "Margherita Pizza 3",
+    "category": "main course",
+    "price": 15.13,
+    "description": "Pizza with tomato, mozzarella, and basil",
+    "stock": 31
+  },
+  {
+    "name": "Caesar Salad 3",
+    "category": "starter",
+    "price": 7.18,
+    "description": "Romaine lettuce with Caesar dressing and croutons",
+    "stock": 24
+  },
+  {
+    "name": "Cheesecake 2",
+    "category": "dessert",
+    "price": 14.37,
+    "description": "Creamy cheesecake with a graham cracker crust",
+    "stock": 22
+  },
+  {
+    "name": "Mini Quiches 3",
+    "category": "starter",
+    "price": 8.26,
+    "description": "Savory tartlets with cheese and vegetables",
+    "stock": 3
+  },
+  {
+    "name": "Apple Pie 2",
+    "category": "dessert",
+    "price": 7.13,
+    "description": "Traditional pie with spiced apple filling",
+    "stock": 2
+  },
+  {
+    "name": "Cheesecake 3",
+    "category": "dessert",
+    "price": 7.87,
+    "description": "Creamy cheesecake with a graham cracker crust",
+    "stock": 30
+  },
+  {
+    "name": "Spring Rolls 3",
+    "category": "starter",
+    "price": 9.72,
+    "description": "Crispy rolls filled with vegetables and glass noodles",
+    "stock": 31
+  },
+  {
+    "name": "French Onion Soup 2",
+    "category": "starter",
+    "price": 9.01,
+    "description": "Rich beef broth with caramelized onions and cheese toast",
+    "stock": 7
+  },
+  {
+    "name": "Apple Pie 3",
+    "category": "dessert",
+    "price": 10.5,
+    "description": "Traditional pie with spiced apple filling",
+    "stock": 29
+  },
+  {
+    "name": "Grilled Salmon 2",
+    "category": "main course",
+    "price": 15.96,
+    "description": "Fresh salmon fillet grilled to perfection with lemon",
+    "stock": 49
+  },
+  {
+    "name": "French Onion Soup 3",
+    "category": "starter",
+    "price": 11.89,
+    "description": "Rich beef broth with caramelized onions and cheese toast",
+    "stock": 26
+  },
+  {
+    "name": "Spring Rolls 4",
+    "category": "starter",
+    "price": 11.69,
+    "description": "Crispy rolls filled with vegetables and glass noodles",
+    "stock": 9
+  },
+  {
+    "name": "Spring Rolls 5",
+    "category": "starter",
+    "price": 8.73,
+    "description": "Crispy rolls filled with vegetables and glass noodles",
+    "stock": 31
+  },
+  {
+    "name": "Caesar Salad 4",
+    "category": "starter",
+    "price": 8.71,
+    "description": "Romaine lettuce with Caesar dressing and croutons",
+    "stock": 3
+  },
+  {
+    "name": "Bruschetta 3",
+    "category": "starter",
+    "price": 11.92,
+    "description": "Toasted bread with tomato and basil",
+    "stock": 30
+  },
+  {
+    "name": "Chocolate Mousse 2",
+    "category": "dessert",
+    "price": 5.34,
+    "description": "Light and airy chocolate dessert",
+    "stock": 13
+  },
+  {
+    "name": "Tiramisu 2",
+    "category": "dessert",
+    "price": 8.18,
+    "description": "Coffee-flavored Italian dessert with mascarpone",
+    "stock": 21
+  },
+  {
+    "name": "Beef Stroganoff 2",
+    "category": "main course",
+    "price": 21.05,
+    "description": "Tender beef strips in a creamy mushroom sauce",
+    "stock": 21
+  },
+  {
+    "name": "Stuffed Mushrooms 2",
+    "category": "starter",
+    "price": 8.23,
+    "description": "Mushroom caps filled with cheese and herbs",
+    "stock": 49
+  },
+  {
+    "name": "Cr\u00e8me Br\u00fbl\u00e9e 3",
+    "category": "dessert",
+    "price": 7.58,
+    "description": "Rich custard with a caramelized sugar crust",
+    "stock": 19
+  },
+  {
+    "name": "Lamb Chops 2",
+    "category": "main course",
+    "price": 17.46,
+    "description": "Grilled lamb chops with rosemary and garlic",
+    "stock": 29
+  },
+  {
+    "name": "Spring Rolls 6",
+    "category": "starter",
+    "price": 9.97,
+    "description": "Crispy rolls filled with vegetables and glass noodles",
+    "stock": 20
+  },
+  {
+    "name": "Spaghetti Bolognese 2",
+    "category": "main course",
+    "price": 23.01,
+    "description": "Classic pasta with a rich meat sauce",
+    "stock": 33
+  },
+  {
+    "name": "Chicken Tikka Masala 2",
+    "category": "main course",
+    "price": 23.48,
+    "description": "Chicken in a creamy tomato and spice sauce",
+    "stock": 16
+  },
+  {
+    "name": "Bruschetta 4",
+    "category": "starter",
+    "price": 9.9,
+    "description": "Toasted bread with tomato and basil",
+    "stock": 16
+  },
+  {
+    "name": "Caprese Salad 3",
+    "category": "starter",
+    "price": 9.68,
+    "description": "Tomatoes, mozzarella, and basil drizzled with olive oil",
+    "stock": 20
+  },
+  {
+    "name": "Caesar Salad 5",
+    "category": "starter",
+    "price": 6.08,
+    "description": "Romaine lettuce with Caesar dressing and croutons",
+    "stock": 35
+  },
+  {
+    "name": "Cr\u00e8me Br\u00fbl\u00e9e 4",
+    "category": "dessert",
+    "price": 14.57,
+    "description": "Rich custard with a caramelized sugar crust",
+    "stock": 35
+  },
+  {
+    "name": "Fruit Salad 2",
+    "category": "dessert",
+    "price": 6.45,
+    "description": "Fresh seasonal fruits tossed together",
+    "stock": 33
+  },
+  {
+    "name": "Fruit Salad 3",
+    "category": "dessert",
+    "price": 6.87,
+    "description": "Fresh seasonal fruits tossed together",
+    "stock": 14
+  },
+  {
+    "name": "Deviled Eggs 4",
+    "category": "starter",
+    "price": 10.09,
+    "description": "Hard-boiled eggs with a creamy mustard filling",
+    "stock": 4
+  },
+  {
+    "name": "Garlic Bread 2",
+    "category": "starter",
+    "price": 10.28,
+    "description": "Oven-baked bread with garlic butter and herbs",
+    "stock": 7
+  },
+  {
+    "name": "French Onion Soup 4",
+    "category": "starter",
+    "price": 10.07,
+    "description": "Rich beef broth with caramelized onions and cheese toast",
+    "stock": 36
+  },
+  {
+    "name": "Spaghetti Bolognese 3",
+    "category": "main course",
+    "price": 18.93,
+    "description": "Classic pasta with a rich meat sauce",
+    "stock": 9
+  },
+  {
+    "name": "Stuffed Mushrooms 3",
+    "category": "starter",
+    "price": 5.34,
+    "description": "Mushroom caps filled with cheese and herbs",
+    "stock": 35
+  },
+  {
+    "name": "Spaghetti Bolognese 4",
+    "category": "main course",
+    "price": 18.8,
+    "description": "Classic pasta with a rich meat sauce",
+    "stock": 43
+  },
+  {
+    "name": "Shrimp Cocktail 2",
+    "category": "starter",
+    "price": 10.32,
+    "description": "Chilled shrimp served with tangy cocktail sauce",
+    "stock": 37
+  },
+  {
+    "name": "Duck Confit 3",
+    "category": "main course",
+    "price": 19.64,
+    "description": "Slow-cooked duck leg with crispy skin",
+    "stock": 35
+  },
+  {
+    "name": "Fruit Salad 4",
+    "category": "dessert",
+    "price": 11.73,
+    "description": "Fresh seasonal fruits tossed together",
+    "stock": 40
+  },
+  {
+    "name": "Tiramisu 3",
+    "category": "dessert",
+    "price": 11.57,
+    "description": "Coffee-flavored Italian dessert with mascarpone",
+    "stock": 13
+  },
+  {
+    "name": "Fruit Salad 5",
+    "category": "dessert",
+    "price": 9.4,
+    "description": "Fresh seasonal fruits tossed together",
+    "stock": 41
+  },
+  {
+    "name": "Spring Rolls 7",
+    "category": "starter",
+    "price": 5.68,
+    "description": "Crispy rolls filled with vegetables and glass noodles",
+    "stock": 14
+  },
+  {
+    "name": "Apple Pie 4",
+    "category": "dessert",
+    "price": 10.54,
+    "description": "Traditional pie with spiced apple filling",
+    "stock": 32
+  },
+  {
+    "name": "Panna Cotta 4",
+    "category": "dessert",
+    "price": 8.18,
+    "description": "Creamy dessert topped with berry coulis",
+    "stock": 15
+  },
+  {
+    "name": "Panna Cotta 5",
+    "category": "dessert",
+    "price": 14.5,
+    "description": "Creamy dessert topped with berry coulis",
+    "stock": 37
+  },
+  {
+    "name": "Fruit Salad 6",
+    "category": "dessert",
+    "price": 12.61,
+    "description": "Fresh seasonal fruits tossed together",
+    "stock": 7
+  },
+  {
+    "name": "French Onion Soup 5",
+    "category": "starter",
+    "price": 8.85,
+    "description": "Rich beef broth with caramelized onions and cheese toast",
+    "stock": 1
+  },
+  {
+    "name": "Fruit Salad 7",
+    "category": "dessert",
+    "price": 10.48,
+    "description": "Fresh seasonal fruits tossed together",
+    "stock": 15
+  },
+  {
+    "name": "Caprese Salad 4",
+    "category": "starter",
+    "price": 6.85,
+    "description": "Tomatoes, mozzarella, and basil drizzled with olive oil",
+    "stock": 2
+  },
+  {
+    "name": "Lemon Tart 3",
+    "category": "dessert",
+    "price": 5.62,
+    "description": "Tangy lemon curd in a buttery crust",
+    "stock": 20
+  },
+  {
+    "name": "Apple Pie 5",
+    "category": "dessert",
+    "price": 12.34,
+    "description": "Traditional pie with spiced apple filling",
+    "stock": 49
+  },
+  {
+    "name": "Stuffed Mushrooms 4",
+    "category": "starter",
+    "price": 9.54,
+    "description": "Mushroom caps filled with cheese and herbs",
+    "stock": 13
+  },
+  {
+    "name": "Ice Cream Sundae 3",
+    "category": "dessert",
+    "price": 10.66,
+    "description": "Vanilla ice cream with chocolate sauce and nuts",
+    "stock": 46
+  },
+  {
+    "name": "Lamb Chops 3",
+    "category": "main course",
+    "price": 14.94,
+    "description": "Grilled lamb chops with rosemary and garlic",
+    "stock": 23
+  },
+  {
+    "name": "Cheesecake 4",
+    "category": "dessert",
+    "price": 13.47,
+    "description": "Creamy cheesecake with a graham cracker crust",
+    "stock": 35
+  },
+  {
+    "name": "Chocolate Mousse 3",
+    "category": "dessert",
+    "price": 8.19,
+    "description": "Light and airy chocolate dessert",
+    "stock": 21
+  }
+]
