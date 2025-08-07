@@ -22,7 +22,7 @@ class UserCreate(SQLModel):
         min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
     )
     # Adresse complète comme (46 rue des michels 44000 Nantes)
-    address: str | None = Field(max_length=200)
+    address: str | None = Field(default=None, max_length=200)
     email: EmailStr = Field(max_length=320)
     password: str
 
