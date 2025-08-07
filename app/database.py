@@ -3,7 +3,7 @@ import os, sys
 sys.path.append(os.getcwd())
 from app.models.models import MenuItem
 from app.schemas.schemas import MenuItemCreate
-from app.crud.menu_items import create_menu_item
+from app.crud.menu_items import create_menu_item_in_db
 from sqlmodel import create_engine, select, SQLModel, Session
 import json
 
@@ -38,7 +38,7 @@ def db_init():
         for menu_item in menu_items:
             menu_item_create = MenuItemCreate(**menu_item)
             menu_item_db = MenuItem(**menu_item_create.model_dump())
-            if create_menu_item(session, menu_item_db):
+            if create_menu_item_in_db(session, menu_item_db):
                 print(f"Added: {menu_item_db.name} in category {menu_item_db.category}")
 
 

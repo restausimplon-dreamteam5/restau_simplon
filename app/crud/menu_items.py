@@ -2,7 +2,7 @@ from sqlmodel import Session
 from app.models.models import MenuItem
 
 
-def create_menu_item(session: Session, menu_item_db: MenuItem) -> bool:
+def create_menu_item_in_db(session: Session, menu_item_db: MenuItem) -> bool:
     """Création d'un article de menu dans la base de données.
 
     Args:
