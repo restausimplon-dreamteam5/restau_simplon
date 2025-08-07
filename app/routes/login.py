@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
 from sqlmodel import select
 
 from app.deps import SessionDep
 from app.models.models import User
-from app.schemas.schemas import Token, UserOut
-from fastapi.security import OAuth2PasswordRequestForm
+from app.schemas.schemas import Token, TokenData
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
 
+router = APIRouter(prefix="/login", tags=["Login"])
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -18,8 +18,29 @@ SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-router = APIRouter(prefix="/login", tags=["Login"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+def extract_data_from_token(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Token invalide",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        sub = payload.get("sub")
+        user_roles = payload.get("roles")
+        exp = payload.get("exp")
+        if sub is None or user_roles is None or exp is None:
+            raise credentials_exception
+    except jwt.InvalidTokenError:
+        raise credentials_exception
+    return TokenData(sub=sub, roles=user_roles, exp=exp)
+
+
+@router.get("/test")
+def get_token_data(token_data: Annotated[TokenData, Depends(extract_data_from_token)]):
+    return token_data
 
 @router.post("/")
 def login(
@@ -41,12 +62,13 @@ def login(
     expiration_date = datetime.now(timezone.utc) + timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
-    
-    user_roles= []
+
+    user_roles = []
     for role in user.roles:
         user_roles.append(role.role)
-    
+
     access_token = {"sub": logins.username, "roles": user_roles, "exp": expiration_date}
     encoded_jwt = jwt.encode(access_token, SECRET_KEY, algorithm=ALGORITHM)
 
     return Token(access_token=encoded_jwt, token_type="bearer")
+

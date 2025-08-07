@@ -12,7 +12,6 @@ from typing import List
 from app.models.models import OrderStatus
 
 
-
 # User
 # TODO: find out about doc
 class UserCreate(SQLModel):
@@ -70,10 +69,18 @@ class UserOut(SQLModel):
     email: EmailStr = Field(max_length=320)
     created_at: datetime
     roles: list[Role]
-    
+
+
 class Token(SQLModel):
     access_token: str
     token_type: str
+
+
+class TokenData(SQLModel):
+    sub: str
+    roles: list[str]
+    exp: datetime
+
 
 # Article
 class MenuItemCreate(SQLModel):
@@ -106,12 +113,14 @@ class MenuItemOut(SQLModel):
     description: str | None = None
     stock: int
 
+
 # Detail commande
 class OrderDetailCreate(SQLModel):
     """Schéma d’entrée pour un article dans une commande"""
 
     item_id: UUID
     quantity: int = Field(default=1, gt=0)
+
 
 # Commande
 class OrderCreate(SQLModel):
@@ -121,27 +130,22 @@ class OrderCreate(SQLModel):
     order_date: datetime = Field(default_factory=datetime.now)
     items: List[OrderDetailCreate]
 
+
 class OrderOut(SQLModel):
     """Schéma de sortie pour une commande
-       Contient les informations de la commande une fois créée ou consultée
+    Contient les informations de la commande une fois créée ou consultée
     """
 
     id: UUID
     user_id: UUID
     order_date: datetime
     status: OrderStatus
-    total_amount: Decimal 
+    total_amount: Decimal
+
 
 class OrderStatusUpdate(SQLModel):
     """Schéma pour mettre à jour le statut d'une commande
-       Permet de changer le statut d'une commande existante
+    Permet de changer le statut d'une commande existante
     """
 
     new_status: OrderStatus
-    
-    
-    
-
-
-
-

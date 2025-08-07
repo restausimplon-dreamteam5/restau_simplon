@@ -9,8 +9,6 @@ app = FastAPI()
 def on_startup():
     create_db_and_tables()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
 app.include_router(login.router)
 app.include_router(menu_item.router)
 app.include_router(user.router)

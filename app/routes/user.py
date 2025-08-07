@@ -22,7 +22,7 @@ def get_all_users(
 def get_user_by_id(id: uuid.UUID, session: SessionDep) -> UserOut:
     return session.exec(select(User).where(User.id == id)).one()
 
-
+# TODO: roles
 @router.post("/")
 def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
     user_db = User(
