@@ -1,4 +1,5 @@
 from typing import Annotated
+import uuid
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import select
 from app.schemas.schemas import UserCreate, UserOut
@@ -16,6 +17,9 @@ def get_all_users(
     users = session.exec(select(User).offset(offset).limit(limit))
     return users
 
+@router.get("/{id}")
+def get_user_by_id(id: uuid.UUID, session: SessionDep) -> UserOut:
+    return session.exec(select(User).where(User.id==id)).one()
 
 @router.post("/")
 def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
@@ -31,3 +35,4 @@ def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
     session.commit()
     print(user_db)
     return user_db
+
