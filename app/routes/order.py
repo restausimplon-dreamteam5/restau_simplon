@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException, status
 from sqlmodel import Session, select
 from app.models.models import Order, OrderDetail, MenuItem
-from app.schemas.schemas import OrderCreate, OrderOut, OrderDetailCreate
+from app.schemas.schemas import OrderCreate, OrderOut, OrderDetailCreate, OrderDetailOut, OrderWithDetailsOut
 from app.deps import SessionDep
 from decimal import Decimal
+from sqlalchemy import func
+from datetime import date
 from uuid import UUID
 
 
@@ -97,5 +99,73 @@ def get_orders_by_user(user_id: UUID, session: SessionDep) -> list[OrderOut]:
         )
 
     return result
+
+@router.get("/{order_id}", response_model=OrderWithDetailsOut)
+def get_order_by_id(order_id: UUID, session: SessionDep) -> OrderWithDetailsOut:
+    """
+    Récupérer une commande avec ses détails à partir de son ID.
+    """
+    order = session.get(Order, order_id)
+
+    if not order:
+        raise HTTPException(status_code=404, detail="Commande non trouvée.")
+
+    # Récupérer les détails associés
+    details = session.exec(
+        select(OrderDetail).where(OrderDetail.order_id == order_id)
+    ).all()
+
+    total_amount = sum(d.quantity * d.unit_price for d in details)
+
+    items_out = [
+        OrderDetailOut(
+            item_id=d.item_id,
+            quantity=d.quantity,
+            unit_price=d.unit_price
+        )
+        for d in details
+    ]
+
+    return OrderWithDetailsOut(
+        id=order.id,
+        user_id=order.user_id,
+        order_date=order.order_date,
+        status=order.status,
+        total_amount=total_amount,
+        items=items_out
+    )
+
+@router.get("/by_date/{query_date}", response_model=list[OrderOut])
+def get_orders_by_date(query_date: date, session: SessionDep) -> list[OrderOut]:
+    """
+    Récupérer les commandes créées à une date précise (ex: 2025-08-07)
+    """
+    orders = session.exec(
+        select(Order).where(func.date(Order.order_date) == query_date)
+    ).all()
+
+    if not orders:
+        raise HTTPException(status_code=404, detail="Aucune commande trouvée pour cette date.")
+
+    results = []
+    for order in orders:
+        # Récupération des détails de commande
+        details = session.exec(
+            select(OrderDetail).where(OrderDetail.order_id == order.id)
+        ).all()
+
+        # Calcul du montant total
+        total_amount = sum(detail.unit_price * detail.quantity for detail in details)
+
+        # Construction de l'objet OrderOut
+        results.append(OrderOut(
+            id=order.id,
+            user_id=order.user_id,
+            order_date=order.order_date,
+            status=order.status,
+            total_amount=total_amount
+        ))
+
+    return results
 
     
