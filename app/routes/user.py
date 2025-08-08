@@ -7,6 +7,7 @@ from app.routes.login import extract_token_data, insufficient_permissions_except
 from app.schemas.schemas import TokenData, UserCreate, UserOut, UserPatch, UserPost
 from app.models.models import Role, User
 from app.deps import SessionDep
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(prefix="/users", tags=["User"])
 
@@ -50,11 +51,10 @@ def get_user_by_id(
         raise insufficient_permissions_exception
 
     try:
-        user = session.exec(select(User).where(User.id == id)).one()
+        return session.exec(select(User).where(User.id == id)).one()
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    return user
+
 
 @router.post("/")
 def insert_user(
@@ -80,9 +80,12 @@ def insert_user(
         salt=salt.decode("utf-8"),
         roles=roles_db,
     )
-    session.add(user_db)
-    session.commit()
-    print(user_db)
+    try:
+        session.add(user_db)
+        # practice: gestion des doublons/unicité, erreur 500 ??? ou 400
+        session.commit()
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     return user_db
 
 
@@ -101,11 +104,12 @@ def partial_update_user(
     if new_user.roles and not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
-    try: 
+    user_db = None
+    try:
         user_db = session.exec(select(User).where(User.id == id)).one()
-    except: 
+    except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     user_salt = user_db.salt.encode("utf-8")
 
     if new_user.first_name:
@@ -126,8 +130,12 @@ def partial_update_user(
         roles_db = find_corresponding_roles(new_user.roles, session)
         user_db.roles = roles_db
 
-    session.add(user_db)  # TODO: email unique exception
-    session.commit()
+    try:
+        session.add(user_db)
+        session.commit()
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
     return user_db
 
 
@@ -141,11 +149,12 @@ def update_user(
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
-    try: 
+    user_db = None
+    try:
         user_db = session.exec(select(User).where(User.id == id)).one()
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-        
+
     # Sécurisation du mot de passe
     user_salt = user_db.salt.encode("utf-8")
     hashed_password = bcrypt.hashpw(new_user.password.encode("utf-8"), user_salt)
@@ -161,8 +170,11 @@ def update_user(
     roles_db = find_corresponding_roles(new_user.roles, session)
     user_db.roles = roles_db
 
-    session.add(user_db)  # TODO: email unique exception
-    session.commit()
+    try:
+        session.add(user_db)
+        session.commit()
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     return user_db
 
 
@@ -179,7 +191,7 @@ def delete_user(
         user_to_delete = session.exec(select(User).where(User.id == id)).one()
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     session.delete(user_to_delete)
     session.commit()
     return True  # TODO: meilleur retour
