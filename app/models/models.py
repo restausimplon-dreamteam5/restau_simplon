@@ -103,7 +103,7 @@ class OrderDetail(SQLModel, table=True):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
-    order_id: uuid.UUID = Field(foreign_key="order.id")
+    order_id: uuid.UUID | None = Field(default = None, foreign_key="order.id")
     item_id: uuid.UUID = Field(foreign_key="menu_item.id")
     
     quantity: int = Field(gt=0, default=1)
