@@ -35,7 +35,8 @@ def get_all_users(
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
-    users = session.exec(select(User).offset(offset).limit(limit))
+    users = session.exec(select(User).offset(offset).limit(limit)).all()
+
     return users
 
 
@@ -48,10 +49,13 @@ def get_user_by_id(
     if not token_data.has_role("admin") and not token_data.is_user(id):
         raise insufficient_permissions_exception
 
-    return session.exec(select(User).where(User.id == id)).one()
+    try:
+        user = session.exec(select(User).where(User.id == id)).one()
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    return user
 
-
-# TODO: roles
 @router.post("/")
 def insert_user(
     new_user: UserCreate,
@@ -63,7 +67,7 @@ def insert_user(
 
     roles_db = find_corresponding_roles(new_user.roles, session)
     hashed_password = bcrypt.hashpw(new_user.password.encode(), bcrypt.gensalt())
-    
+
     user_db = User(
         first_name=new_user.first_name,
         surname=new_user.surname,
@@ -94,8 +98,11 @@ def partial_update_user(
     if new_user.roles and not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
-    user_db = session.exec(select(User).where(User.id == id)).one()
-
+    try: 
+        user_db = session.exec(select(User).where(User.id == id)).one()
+    except: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
     if new_user.first_name:
         user_db.first_name = new_user.first_name
     if new_user.surname:
@@ -112,7 +119,7 @@ def partial_update_user(
     if new_user.roles:
         roles_db = find_corresponding_roles(new_user.roles, session)
         user_db.roles = roles_db
-        
+
     session.add(user_db)  # TODO: email unique exception
     session.commit()
     return user_db
@@ -128,8 +135,11 @@ def update_user(
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
-    user_db = session.exec(select(User).where(User.id == id)).one()
-
+    try: 
+        user_db = session.exec(select(User).where(User.id == id)).one()
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
     hashed_password = bcrypt.hashpw(new_user.password.encode(), bcrypt.gensalt())
 
     user_db.first_name = new_user.first_name
@@ -157,7 +167,11 @@ def delete_user(
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
-    user_to_delete = session.exec(select(User).where(User.id == id)).one()
+    try:
+        user_to_delete = session.exec(select(User).where(User.id == id)).one()
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
     session.delete(user_to_delete)
     session.commit()
     return True  # TODO: meilleur retour
