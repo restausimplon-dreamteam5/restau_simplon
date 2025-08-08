@@ -40,7 +40,7 @@ class UserPatch(SQLModel):
     address: str | None = Field(default=None, max_length=200)
     email: EmailStr | None = Field(default=None, max_length=320)
     password: str | None = None
-    roles: list[str]
+    roles: list[str] | None = None
 
 
 class UserPost(SQLModel):
