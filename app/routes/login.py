@@ -9,6 +9,7 @@ from app.models.models import User
 from app.schemas.schemas import Token, TokenData
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
+import bcrypt
 
 router = APIRouter(prefix="/login", tags=["Login"])
 
@@ -49,7 +50,9 @@ def extract_token_data(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @router.get("/test")
-def get_token_data(token_data: Annotated[TokenData, Depends(extract_token_data)]) -> TokenData:
+def get_token_data(
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> TokenData:
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
     return token_data
@@ -59,7 +62,11 @@ def get_token_data(token_data: Annotated[TokenData, Depends(extract_token_data)]
 def login(
     logins: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep
 ) -> Token:
-    hashed_password = logins.password  # TODO: hashé et salé le mdp
+    hashed_password = bcrypt.hashpw(logins.password.encode(), bcrypt.gensalt())
+    print(
+        f"{logins.password} --- {hashed_password.decode('utf-8')}"
+    )  # TODO: A supprimer: verif mdp hashé et salé
+
     try:
         user = session.exec(
             select(User)
