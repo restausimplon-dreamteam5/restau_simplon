@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
+from typing import Annotated
 from sqlmodel import Session, select
 from app.models.models import Order, OrderDetail, MenuItem, OrderStatus
-from app.schemas.schemas import OrderCreate, OrderOut, OrderDetailCreate, OrderDetailOut, OrderWithDetailsOut, OrderStatusUpdate
+from app.schemas.schemas import OrderCreate, OrderOut, OrderDetailCreate, OrderDetailOut, OrderWithDetailsOut, OrderStatusUpdate, TokenData 
 from app.deps import SessionDep
+from app.routes.login import extract_token_data, insufficient_permissions_exception
 from decimal import Decimal
 from sqlalchemy import func
 from datetime import date
@@ -14,6 +16,7 @@ router = APIRouter(prefix="/orders", tags=["Orders"])
 @router.get("/with_details")
 def read_orders_with_details(
     session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
     skip: int = 0,
     limit: int = 20
 ) -> list[OrderWithDetailsOut]:
@@ -32,6 +35,10 @@ def read_orders_with_details(
     Returns:
         list[OrderWithDetailsOut]: Liste des commandes avec leurs détails
     """
+
+    # Vérifie que l'utilisateur a bien le rôle "admin"
+    if not token_data.has_role("admin"):
+        raise insufficient_permissions_exception
 
     orders = session.exec(
         select(Order).offset(skip).limit(limit)
@@ -63,7 +70,11 @@ def read_orders_with_details(
 
 
 @router.post("/")
-def create_order(order: OrderCreate, session: SessionDep) -> OrderOut:
+def create_order(
+    order: OrderCreate,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)]
+) -> OrderOut:
     """**Création d'une commande avec plusieurs articles**
 
     * Vérifie l'existence de chaque article
@@ -77,7 +88,11 @@ def create_order(order: OrderCreate, session: SessionDep) -> OrderOut:
     Returns:
         OrderOut: Commande enregistrée avec son montant total
     """
-
+   
+    # Si c’est un client, il ne peut commander que pour lui-même
+    if token_data.has_role("client") and not token_data.is_user(order.user_id):
+        raise insufficient_permissions_exception
+    
     total_amount = Decimal("0.00")
 
     # Création de la commande
@@ -116,7 +131,11 @@ def create_order(order: OrderCreate, session: SessionDep) -> OrderOut:
 
 
 @router.get("/by_client/{user_id}")
-def get_orders_by_user(user_id: UUID, session: SessionDep) -> list[OrderOut]:
+def get_orders_by_user(
+    user_id: UUID,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)]
+) -> list[OrderOut]:
     """**Récupération des commandes d’un utilisateur**
 
     * Affiche l’historique des commandes associées à un user_id
@@ -133,6 +152,10 @@ def get_orders_by_user(user_id: UUID, session: SessionDep) -> list[OrderOut]:
         list[OrderOut]: Liste des commandes du client
     """
 
+    # Seul le client concerné OU le staff peuvent accéder
+    if not token_data.has_role("admin") and not token_data.has_role("employee") and not token_data.is_user(user_id):
+        raise insufficient_permissions_exception
+    
     orders = session.exec(
         select(Order).where(Order.user_id == user_id)
     ).all()
@@ -162,7 +185,11 @@ def get_orders_by_user(user_id: UUID, session: SessionDep) -> list[OrderOut]:
 
 
 @router.get("/by_order/{order_id}")
-def get_order_by_id(order_id: UUID, session: SessionDep) -> OrderWithDetailsOut:
+def get_order_by_id(
+    order_id: UUID,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)]
+) -> OrderWithDetailsOut:
     """**Récupération d'une commande avec ses détails**
 
     * À partir de son ID unique
@@ -183,6 +210,9 @@ def get_order_by_id(order_id: UUID, session: SessionDep) -> OrderWithDetailsOut:
     if not order:
         raise HTTPException(status_code=404, detail="Commande non trouvée.")
 
+    # Vérification : seul le propriétaire de la commande OU le staff peut accéder
+    if not token_data.has_role("admin") and not token_data.has_role("employee") and not token_data.is_user(order.user_id):
+        raise insufficient_permissions_exception
     
     total_amount = sum(d.quantity * d.unit_price for d in order.details)
 
@@ -206,7 +236,11 @@ def get_order_by_id(order_id: UUID, session: SessionDep) -> OrderWithDetailsOut:
 
 
 @router.get("/by_date/{query_date}")
-def get_orders_by_date(query_date: date, session: SessionDep) -> list[OrderOut]:
+def get_orders_by_date(
+    query_date: date,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)]
+) -> list[OrderOut]:
     """**Récupération des commandes par date**
 
     * Retourne toutes les commandes passées à une date précise (format : YYYY-MM-DD)
@@ -223,6 +257,10 @@ def get_orders_by_date(query_date: date, session: SessionDep) -> list[OrderOut]:
         list[OrderOut]: Liste des commandes avec leurs montants totaux
     """
 
+    # Restriction d'accès : seuls admin/employee peuvent voir toutes les commandes d'une date
+    if not token_data.has_role("admin") and not token_data.has_role("employee"):
+        raise insufficient_permissions_exception
+    
     orders = session.exec(
         select(Order).where(func.date(Order.order_date) == query_date)
     ).all()
@@ -254,7 +292,8 @@ def get_orders_by_date(query_date: date, session: SessionDep) -> list[OrderOut]:
 def update_order_status(
     order_id: UUID,
     status_update: OrderStatusUpdate,
-    session: SessionDep
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)]
 ) -> dict:
     """**Mise à jour du statut d'une commande avec transitions contrôlées**
 
@@ -276,6 +315,10 @@ def update_order_status(
         dict: Message de confirmation du changement de statut
     """
 
+    # Vérification des rôles
+    if not token_data.has_role("admin") and not token_data.has_role("employee"):
+        raise insufficient_permissions_exception
+    
     order = session.get(Order, order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Commande non trouvée.")
