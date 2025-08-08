@@ -43,19 +43,9 @@ def extract_token_data(token: Annotated[str, Depends(oauth2_scheme)]):
         if sub is None or user_roles is None or exp is None:
             raise credentials_exception
 
-        # TODO: vérifier que le token ne soit pas expirer
     except jwt.InvalidTokenError:
         raise credentials_exception
     return TokenData(sub=sub, roles=user_roles, exp=exp)
-
-
-@router.get("/test")
-def get_token_data(
-    token_data: Annotated[TokenData, Depends(extract_token_data)],
-) -> TokenData:
-    if not token_data.has_role("admin"):
-        raise insufficient_permissions_exception
-    return token_data
 
 
 @router.post("/")
