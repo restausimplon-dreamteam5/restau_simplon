@@ -4,13 +4,12 @@ import uuid
 from decimal import Decimal
 
 from pydantic import EmailStr
-from app.models.models import MenuCategory
+from app.models.models import MenuCategory, Role
 from sqlmodel import SQLModel, Field
 from uuid import UUID
 from datetime import datetime
 from typing import List
 from app.models.models import OrderStatus
-
 
 
 # User
@@ -25,6 +24,7 @@ class UserCreate(SQLModel):
     address: str | None = Field(default=None, max_length=200)
     email: EmailStr = Field(max_length=320)
     password: str
+    roles: list[str]
 
 
 class UserPatch(SQLModel):
@@ -40,6 +40,7 @@ class UserPatch(SQLModel):
     address: str | None = Field(default=None, max_length=200)
     email: EmailStr | None = Field(default=None, max_length=320)
     password: str | None = None
+    roles: list[str] | None = None
 
 
 class UserPost(SQLModel):
@@ -52,6 +53,7 @@ class UserPost(SQLModel):
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(max_length=320)
     password: str
+    roles: list[str]
 
 
 class UserOut(SQLModel):
@@ -69,6 +71,24 @@ class UserOut(SQLModel):
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(max_length=320)
     created_at: datetime
+    roles: list[Role]
+
+
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(SQLModel):
+    sub: str  # user id
+    roles: list[str]
+    exp: datetime
+
+    def has_role(self, role: str) -> bool:
+        return role in self.roles
+
+    def is_user(self, user_id: uuid.UUID):
+        return uuid.UUID(self.sub) == user_id
 
 
 # Article
@@ -102,6 +122,7 @@ class MenuItemOut(SQLModel):
     description: str | None = None
     stock: int
 
+
 # Detail commande
 class OrderDetailCreate(SQLModel):
     """Schéma d’entrée pour un article dans une commande"""
@@ -109,25 +130,30 @@ class OrderDetailCreate(SQLModel):
     item_id: UUID
     quantity: int = Field(default=1, gt=0)
 
+
 class OrderDetailOut(SQLModel):
     """Schéma de sortie pour un article dans une commande"""
+
     item_id: UUID
     quantity: int
     unit_price: Decimal
 
+
 class OrderOut(SQLModel):
     """Schéma de sortie pour une commande
-       Contient les informations de la commande une fois créée ou consultée
+    Contient les informations de la commande une fois créée ou consultée
     """
 
     id: UUID
     user_id: UUID
     order_date: datetime
     status: OrderStatus
-    total_amount: Decimal 
+    total_amount: Decimal
+
 
 class OrderWithDetailsOut(OrderOut):
     items: list[OrderDetailOut]
+
 
 # Commande
 class OrderCreate(SQLModel):
@@ -137,16 +163,10 @@ class OrderCreate(SQLModel):
     order_date: datetime = Field(default_factory=datetime.now)
     items: List[OrderDetailCreate]
 
+
 class OrderStatusUpdate(SQLModel):
     """Schéma pour mettre à jour le statut d'une commande
-       Permet de changer le statut d'une commande existante
+    Permet de changer le statut d'une commande existante
     """
 
     new_status: OrderStatus
-    
-
-    
-
-
-
-
