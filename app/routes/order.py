@@ -22,7 +22,7 @@ def read_orders_with_details(
     
     * Pagination avec skip et limit
     * Calcul automatique du montant total
-    * Structuration des détails (articles + quantité + prix unitaire)
+    * Utilisation la relation Order.details (back_populates)
     
     Args:
         session (SessionDep): Session avec la base de données
@@ -39,19 +39,15 @@ def read_orders_with_details(
 
     results = []
     for order in orders:
-        details = session.exec(
-            select(OrderDetail).where(OrderDetail.order_id == order.id)
-        ).all()
-
-        total_amount = sum(detail.unit_price * detail.quantity for detail in details)
+        total_amount = sum(d.unit_price * d.quantity for d in order.details)
 
         items = [
             OrderDetailOut(
-                item_id=detail.item_id,
-                quantity=detail.quantity,
-                unit_price=detail.unit_price
+                item_id=d.item_id,
+                quantity=d.quantity,
+                unit_price=d.unit_price
             )
-            for detail in details
+            for d in order.details
         ]
 
         results.append(OrderWithDetailsOut(
@@ -82,13 +78,11 @@ def create_order(order: OrderCreate, session: SessionDep) -> OrderOut:
         OrderOut: Commande enregistrée avec son montant total
     """
 
+    total_amount = Decimal("0.00")
+
     # Création de la commande
     order_db = Order(user_id=order.user_id)
-    session.add(order_db)
-    session.commit()
-    session.refresh(order_db)
-
-    total_amount = Decimal("0.00")
+    session.add(order_db)  
 
     # Création des détails de commande
     for item in order.items:
@@ -100,7 +94,7 @@ def create_order(order: OrderCreate, session: SessionDep) -> OrderOut:
             )
 
         detail = OrderDetail(
-            order_id=order_db.id,
+            order=order_db,
             item_id=item.item_id,
             quantity=item.quantity,
             unit_price=item_db.price
@@ -110,6 +104,7 @@ def create_order(order: OrderCreate, session: SessionDep) -> OrderOut:
         session.add(detail)
 
     session.commit()
+    session.refresh(order_db)
 
     return OrderOut(
         id=order_db.id,
@@ -138,18 +133,22 @@ def get_orders_by_user(user_id: UUID, session: SessionDep) -> list[OrderOut]:
         list[OrderOut]: Liste des commandes du client
     """
 
-    orders = session.exec(select(Order).where(Order.user_id == user_id)).all()
+    orders = session.exec(
+        select(Order).where(Order.user_id == user_id)
+    ).all()
 
     if not orders:
-        raise HTTPException(status_code=404, detail="Aucune commande trouvée pour ce client.")
+        raise HTTPException(
+            status_code=404,
+            detail="Aucune commande trouvée pour ce client."
+        )
 
     results = []
     for order in orders:
-        details = session.exec(
-            select(OrderDetail).where(OrderDetail.order_id == order.id)
-        ).all()
-
-        total_amount = sum(detail.unit_price * detail.quantity for detail in details)
+        # Accès direct grâce à la relation back_populates
+        total_amount = sum(
+            detail.unit_price * detail.quantity for detail in order.details
+        )
 
         results.append(OrderOut(
             id=order.id,
@@ -184,11 +183,8 @@ def get_order_by_id(order_id: UUID, session: SessionDep) -> OrderWithDetailsOut:
     if not order:
         raise HTTPException(status_code=404, detail="Commande non trouvée.")
 
-    details = session.exec(
-        select(OrderDetail).where(OrderDetail.order_id == order_id)
-    ).all()
-
-    total_amount = sum(d.quantity * d.unit_price for d in details)
+    
+    total_amount = sum(d.quantity * d.unit_price for d in order.details)
 
     items_out = [
         OrderDetailOut(
@@ -196,7 +192,7 @@ def get_order_by_id(order_id: UUID, session: SessionDep) -> OrderWithDetailsOut:
             quantity=d.quantity,
             unit_price=d.unit_price
         )
-        for d in details
+        for d in order.details
     ]
 
     return OrderWithDetailsOut(
@@ -239,13 +235,8 @@ def get_orders_by_date(query_date: date, session: SessionDep) -> list[OrderOut]:
 
     results = []
     for order in orders:
-        # Récupération des détails de commande
-        details = session.exec(
-            select(OrderDetail).where(OrderDetail.order_id == order.id)
-        ).all()
-
-        # Calcul du montant total
-        total_amount = sum(detail.unit_price * detail.quantity for detail in details)
+        # Calcul du montant total grace a la relation order.details
+        total_amount = sum(detail.unit_price * detail.quantity for detail in order.details)
 
         # Construction de l'objet OrderOut
         results.append(OrderOut(
