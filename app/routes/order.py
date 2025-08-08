@@ -132,7 +132,7 @@ def get_orders_by_user(user_id: UUID, session: SessionDep) -> list[OrderOut]:
         session (SessionDep): Session de base de données
 
     Raises:
-        HTTPException: Si aucune commande n'est trouvée
+        HTTPException: Si aucune commande n'est trouvé
 
     Returns:
         list[OrderOut]: Liste des commandes du client
