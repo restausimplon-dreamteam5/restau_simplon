@@ -3,10 +3,23 @@ import uuid
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import select
 from app.schemas.schemas import UserCreate, UserOut, UserPatch, UserPost
-from app.models.models import User
+from app.models.models import Role, User
 from app.deps import SessionDep
 
 router = APIRouter(prefix="/users", tags=["User"])
+
+
+def find_corresponding_roles(roles: list[str], session: SessionDep):
+    res = []
+    for role in roles:
+        try:
+            res.append(session.exec(select(Role).where(Role.role == role)).one())
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Role '{role}' n'existe pas",
+            )
+    return res
 
 
 # TODO: droits admin
@@ -22,9 +35,11 @@ def get_all_users(
 def get_user_by_id(id: uuid.UUID, session: SessionDep) -> UserOut:
     return session.exec(select(User).where(User.id == id)).one()
 
+
 # TODO: roles
 @router.post("/")
 def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
+    roles_db = find_corresponding_roles(new_user.roles, session)
     user_db = User(
         first_name=new_user.first_name,
         surname=new_user.surname,
@@ -32,6 +47,7 @@ def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
         address=new_user.address,
         email=new_user.email,
         password=new_user.password,  # TODO: hashé et salé le mdp
+        roles=roles_db,
     )
     session.add(user_db)
     session.commit()
@@ -57,6 +73,9 @@ def partial_update_user(
         user_db.address = new_user.address
     if new_user.password:  # TODO: hashé et salé le mdp
         user_db.password = new_user.password
+    if new_user.roles:
+        roles_db = find_corresponding_roles(new_user.roles, session)
+        user_db.roles = roles_db
 
     session.add(user_db)  # TODO: email unique exception
     session.commit()
@@ -75,6 +94,9 @@ def update_user(id: uuid.UUID, new_user: UserPost, session: SessionDep) -> UserO
     if new_user.address:
         user_db.address = new_user.address
 
+    roles_db = find_corresponding_roles(new_user.roles, session)
+    user_db.roles = roles_db
+
     session.add(user_db)  # TODO: email unique exception
     session.commit()
     return user_db
@@ -85,4 +107,4 @@ def delete_user(id: uuid.UUID, session: SessionDep) -> bool:
     user_to_delete = session.exec(select(User).where(User.id == id)).one()
     session.delete(user_to_delete)
     session.commit()
-    return True # TODO: meilleur retour
+    return True  # TODO: meilleur retour

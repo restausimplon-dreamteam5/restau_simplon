@@ -24,6 +24,7 @@ class UserCreate(SQLModel):
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(max_length=320)
     password: str
+    roles: list[str]
 
 
 class UserPatch(SQLModel):
@@ -39,6 +40,7 @@ class UserPatch(SQLModel):
     address: str | None = Field(default=None, max_length=200)
     email: EmailStr | None = Field(default=None, max_length=320)
     password: str | None = None
+    roles: list[str]
 
 
 class UserPost(SQLModel):
@@ -51,6 +53,7 @@ class UserPost(SQLModel):
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(max_length=320)
     password: str
+    roles: list[str]
 
 
 class UserOut(SQLModel):
