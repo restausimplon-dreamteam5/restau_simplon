@@ -81,7 +81,7 @@ def login(
 
     user_salt = user.salt.encode("utf-8")
     hashed_password = bcrypt.hashpw(logins.password.encode("utf-8"), user_salt)
-    if hashed_password != user.password:
+    if hashed_password.decode("utf-8") != user.password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Mot de passe invalide",
