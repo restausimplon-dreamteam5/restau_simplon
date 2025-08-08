@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
 
@@ -20,7 +21,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-def extract_data_from_token(token: Annotated[str, Depends(oauth2_scheme)]):
+insufficient_permissions_exception = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail="Permissions insuffisantes",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
+
+def extract_token_data(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Token invalide",
@@ -33,25 +41,38 @@ def extract_data_from_token(token: Annotated[str, Depends(oauth2_scheme)]):
         exp = payload.get("exp")
         if sub is None or user_roles is None or exp is None:
             raise credentials_exception
+
+        # TODO: vérifier que le token ne soit pas expirer
     except jwt.InvalidTokenError:
         raise credentials_exception
     return TokenData(sub=sub, roles=user_roles, exp=exp)
 
 
 @router.get("/test")
-def get_token_data(token_data: Annotated[TokenData, Depends(extract_data_from_token)]):
+def get_token_data(token_data: Annotated[TokenData, Depends(extract_token_data)]) -> TokenData:
+    if not token_data.has_role("admin"):
+        raise insufficient_permissions_exception
     return token_data
+
 
 @router.post("/")
 def login(
     logins: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep
 ) -> Token:
     hashed_password = logins.password  # TODO: hashé et salé le mdp
-    user = session.exec(
-        select(User)
-        .where(User.email == logins.username)
-        .where(User.password == hashed_password)
-    ).one()
+    try:
+        user = session.exec(
+            select(User)
+            .where(User.email == logins.username)
+            .where(User.password == hashed_password)
+        ).one()
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Identifiants invalides",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -67,8 +88,7 @@ def login(
     for role in user.roles:
         user_roles.append(role.role)
 
-    access_token = {"sub": logins.username, "roles": user_roles, "exp": expiration_date}
+    access_token = {"sub": str(user.id), "roles": user_roles, "exp": expiration_date}
     encoded_jwt = jwt.encode(access_token, SECRET_KEY, algorithm=ALGORITHM)
 
     return Token(access_token=encoded_jwt, token_type="bearer")
-

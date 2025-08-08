@@ -1,8 +1,9 @@
 from typing import Annotated
 import uuid
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import select
-from app.schemas.schemas import UserCreate, UserOut, UserPatch, UserPost
+from app.routes.login import extract_token_data, insufficient_permissions_exception
+from app.schemas.schemas import TokenData, UserCreate, UserOut, UserPatch, UserPost
 from app.models.models import Role, User
 from app.deps import SessionDep
 
@@ -22,23 +23,43 @@ def find_corresponding_roles(roles: list[str], session: SessionDep):
     return res
 
 
-# TODO: droits admin
 @router.get("/")
 def get_all_users(
-    session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+    offset: int = 0,
+    limit: Annotated[int, Query(le=100)] = 100,
 ) -> list[UserOut]:
+
+    if not token_data.has_role("admin"):
+        raise insufficient_permissions_exception
+
     users = session.exec(select(User).offset(offset).limit(limit))
     return users
 
 
 @router.get("/{id}")
-def get_user_by_id(id: uuid.UUID, session: SessionDep) -> UserOut:
+def get_user_by_id(
+    id: uuid.UUID,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> UserOut:
+    if not token_data.has_role("admin") and not token_data.is_user(id):
+        raise insufficient_permissions_exception
+
     return session.exec(select(User).where(User.id == id)).one()
 
 
 # TODO: roles
 @router.post("/")
-def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
+def insert_user(
+    new_user: UserCreate,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> UserOut:
+    if not token_data.has_role("admin"):
+        raise insufficient_permissions_exception
+
     roles_db = find_corresponding_roles(new_user.roles, session)
     user_db = User(
         first_name=new_user.first_name,
@@ -57,8 +78,19 @@ def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
 
 @router.patch("/{id}")
 def partial_update_user(
-    id: uuid.UUID, new_user: UserPatch, session: SessionDep
+    id: uuid.UUID,
+    new_user: UserPatch,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> UserOut:
+
+    if not token_data.has_role("admin") and not token_data.is_user(id):
+        raise insufficient_permissions_exception
+
+    # Seulement les amdins peuvent modifier les roles
+    if new_user.roles and not token_data.has_role("admin"):
+        raise insufficient_permissions_exception
+
     user_db = session.exec(select(User).where(User.id == id)).one()
 
     if new_user.first_name:
@@ -83,7 +115,15 @@ def partial_update_user(
 
 
 @router.put("/{id}")
-def update_user(id: uuid.UUID, new_user: UserPost, session: SessionDep) -> UserOut:
+def update_user(
+    id: uuid.UUID,
+    new_user: UserPost,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> UserOut:
+    if not token_data.has_role("admin"):
+        raise insufficient_permissions_exception
+
     user_db = session.exec(select(User).where(User.id == id)).one()
 
     user_db.first_name = new_user.first_name
@@ -103,7 +143,14 @@ def update_user(id: uuid.UUID, new_user: UserPost, session: SessionDep) -> UserO
 
 
 @router.delete("/{id}")
-def delete_user(id: uuid.UUID, session: SessionDep) -> bool:
+def delete_user(
+    id: uuid.UUID,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> bool:
+    if not token_data.has_role("admin"):
+        raise insufficient_permissions_exception
+
     user_to_delete = session.exec(select(User).where(User.id == id)).one()
     session.delete(user_to_delete)
     session.commit()

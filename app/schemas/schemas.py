@@ -80,9 +80,15 @@ class Token(SQLModel):
 
 
 class TokenData(SQLModel):
-    sub: str
+    sub: str  # user id
     roles: list[str]
     exp: datetime
+
+    def has_role(self, role: str) -> bool:
+        return role in self.roles
+
+    def is_user(self, user_id: uuid.UUID):
+        return uuid.UUID(self.sub) == user_id
 
 
 # Article
