@@ -1,9 +1,10 @@
 from uuid import UUID
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status, Depends
 from typing import Annotated
 from decimal import Decimal
 from sqlmodel import select
-from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate
+from app.routes.login import extract_token_data, insufficient_permissions_exception
+from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate, TokenData
 from app.models.models import MenuItem, MenuCategory
 from app.crud.menu_items import create_menu_item_in_db
 from app.deps import SessionDep
@@ -12,19 +13,28 @@ router = APIRouter(prefix="/menu_items", tags=["Menu items"])
 
 
 @router.post("/")
-def create_menu_item(menu_item: MenuItemCreate, session: SessionDep) -> MenuItemOut:
+def create_menu_item(
+    menu_item: MenuItemCreate,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> MenuItemOut:
     """**Ajout d'un article de menu dans la base de donnée.**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemCreate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
-    Args:
-        menu_item (MenuItemCreate): Les informations entrantes
-        session (SessionDep): La session communicante avec la BDD
+    **Permissions**: admin, staff
 
-    Returns:
-        MenuItemOut: Les informations sortantes
+    **Args**:
+    * menu_item (*MenuItemCreate*): Les informations entrantes
+    * session (*SessionDep*): La session communicante avec la BDD
+
+    **Returns**:
+    * *MenuItemOut*: Les informations sortantes
     """
+    # Gestion permission
+    if not token_data.has_role("admin") and not token_data.has_role("staff"):
+        raise insufficient_permissions_exception
 
     menu_item_db = MenuItem(**menu_item.model_dump())
     create_menu_item_in_db(session, menu_item_db)
@@ -45,13 +55,15 @@ def read_menu_items(
 
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
-    Args:
-        session (SessionDep): La session communicante avec la BDD
-        offset (int, optional): Décalage pour le premier article à lire. Par défaut: 0.
-        limit (int <= 100, optional): Limite du nombre d'articles retournées. Par défaut: 100.
+    **Permissions**: sans condition
 
-    Returns:
-        list[MenuItemOut]: Liste des informations sortantes
+    **Args**:
+    * **session** (*SessionDep*): La session communicante avec la BDD
+    * **offset** (*int*, optional): Décalage pour le premier article à lire. Par défaut: 0.
+    * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées. Par défaut: 100.
+
+    *Returns*:
+    * *list[MenuItemOut]*: Liste des informations sortantes
     """
 
     menu_items_db = session.exec(select(MenuItem).offset(offset).limit(limit)).all()
@@ -66,6 +78,8 @@ def read_menu_category(menu_category: str, session: SessionDep) -> list[MenuItem
     """**Récupération des articles de menu**, dont la catégorie est **menu_category**
 
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Permissions**: sans condition
 
     **Args**:
     * **menu_category** (*str*): La catégorie d'articles de menu
@@ -106,6 +120,8 @@ def read_menu_item_by_name(menu_item_name: str, session: SessionDep) -> MenuItem
 
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
+    **Permissions**: sans condition
+
     **Args**:
     * **menu_item_name** (*str*): Le nom de l'article
     * **session** (*SessionDep*): La session communicante avec la BDD
@@ -134,6 +150,8 @@ def read_menu_item_by_id(menu_item_id: UUID, session: SessionDep) -> MenuItemOut
 
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
+    **Permissions**: sans condition
+
     **Args**:
     * **menu_item_id** (*UUID*): L'ID unique de l'article de menu
     * **session** (*SessionDep*): La session communicante avec la BDD
@@ -156,12 +174,17 @@ def read_menu_item_by_id(menu_item_id: UUID, session: SessionDep) -> MenuItemOut
 
 @router.patch("/name/{menu_item_name}")
 def partial_update_menu_item_by_name(
-    menu_item_name: str, new_menu_item: MenuItemUpdate, session: SessionDep
+    menu_item_name: str,
+    new_menu_item: MenuItemUpdate,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
     """**Mise à jour partielle de l'article de menu**, dont le nom est **menu_item_name**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemUpdate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Permissions**: admin, staff
 
     **Args**:
     * **menu_item_name** (*str*): Le nom de l'article
@@ -174,6 +197,9 @@ def partial_update_menu_item_by_name(
     **Returns**:
     * (*MenuItemOut*): Les informations sortantes
     """
+    # Gestion permission
+    if not token_data.has_role("admin") and not token_data.has_role("staff"):
+        raise insufficient_permissions_exception
 
     # Recherche de l'article de menu dans la base
     menu_item_db = session.exec(
@@ -204,12 +230,17 @@ def partial_update_menu_item_by_name(
 
 @router.patch("/id/{menu_item_id}")
 def partial_update_menu_item_by_id(
-    menu_item_id: UUID, new_menu_item: MenuItemUpdate, session: SessionDep
+    menu_item_id: UUID,
+    new_menu_item: MenuItemUpdate,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
     """**Mise à jour partielle de l'article de menu**, dont l'ID est **menu_item_id**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemUpdate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Permissions**: admin, staff
 
     **Args**:
     * **menu_item_id** (*UUID*): L'ID unique de l'article
@@ -222,6 +253,9 @@ def partial_update_menu_item_by_id(
     **Returns**:
     * (*MenuItemOut*): Les informations sortantes
     """
+    # Gestion permission
+    if not token_data.has_role("admin") and not token_data.has_role("staff"):
+        raise insufficient_permissions_exception
 
     # Recherche de l'article de menu dans la base de données
     menu_item_db = session.get(MenuItem, menu_item_id)
@@ -250,12 +284,17 @@ def partial_update_menu_item_by_id(
 
 @router.put("/name/{menu_item_name}")
 def update_menu_item_by_name(
-    menu_item_name: str, new_menu_item: MenuItemCreate, session: SessionDep
+    menu_item_name: str,
+    new_menu_item: MenuItemCreate,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
     """**Mise à jour complète de l'article de menu**, dont le nom est **menu_item_name**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemCreate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Permissions**: admin, staff
 
     **Args**:
     * **menu_item_name** (*str*): Le nom de l'article
@@ -268,6 +307,9 @@ def update_menu_item_by_name(
     **Returns**:
     * (*MenuItemOut*): Les informations sortantes
     """
+    # Gestion permission
+    if not token_data.has_role("admin") and not token_data.has_role("staff"):
+        raise insufficient_permissions_exception
 
     # Recherche de l'article de menu dans la base de données
     menu_item_db = session.exec(
@@ -289,12 +331,17 @@ def update_menu_item_by_name(
 
 @router.put("/id/{menu_item_id}")
 def update_menu_item_by_id(
-    menu_item_id: UUID, new_menu_item: MenuItemCreate, session: SessionDep
+    menu_item_id: UUID,
+    new_menu_item: MenuItemCreate,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
     """**Mise à jour complète de l'article de menu**, dont l'ID est **menu_item_id**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemCreate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
+
+    **Permissions**: admin, staff
 
     **Args**:
     * **menu_item_id** (*UUID*): L'ID unique de l'article
@@ -307,6 +354,9 @@ def update_menu_item_by_id(
     **Returns**:
     * (*MenuItemOut*): Les informations sortantes
     """
+    # Gestion permission
+    if not token_data.has_role("admin") and not token_data.has_role("staff"):
+        raise insufficient_permissions_exception
 
     # Recherche de l'article de menu dans la base de données
     menu_item_db = session.get(MenuItem, menu_item_id)
@@ -325,8 +375,14 @@ def update_menu_item_by_id(
 
 
 @router.delete("/name/{menu_item_name}")
-def delete_menu_item_by_name(menu_item_name: str, session: SessionDep) -> bool:
+def delete_menu_item_by_name(
+    menu_item_name: str,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> bool:
     """**Suppression de l'article de menu**, dont le nom est **menu_item_name**
+
+    **Permissions**: admin, staff
 
     **Args**:
     * **menu_item_name** (*str*): Le nom de l'article
@@ -338,7 +394,11 @@ def delete_menu_item_by_name(menu_item_name: str, session: SessionDep) -> bool:
     **Returns**:
     * (*bool*): Vrai si l'article a été supprimé
     """
+    # Gestion permission
+    if not token_data.has_role("admin") and not token_data.has_role("staff"):
+        raise insufficient_permissions_exception
 
+    # Recherche de l'article de menu
     menu_item_db = session.exec(
         select(MenuItem).where(MenuItem.name == menu_item_name)
     ).first()
@@ -346,14 +406,22 @@ def delete_menu_item_by_name(menu_item_name: str, session: SessionDep) -> bool:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Menu item not found"
         )
+
+    # Suppression
     session.delete(menu_item_db)
     session.commit()
     return True
 
 
 @router.delete("/id/{menu_item_id}")
-def delete_menu_item_by_id(menu_item_id: UUID, session: SessionDep) -> bool:
+def delete_menu_item_by_id(
+    menu_item_id: UUID,
+    session: SessionDep,
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
+) -> bool:
     """**Suppression de l'article de menu**, dont l'ID est **menu_item_id**
+
+    **Permissions**: admin, staff
 
     **Args**:
     * **menu_item_id** (*UUID*): L'ID unique de l'article
@@ -365,12 +433,18 @@ def delete_menu_item_by_id(menu_item_id: UUID, session: SessionDep) -> bool:
     **Returns**:
     * (*bool*): Vrai si l'article a été supprimé
     """
+    # Gestion permission
+    if not token_data.has_role("admin") and not token_data.has_role("staff"):
+        raise insufficient_permissions_exception
 
+    # Recherche de l'article de menu
     menu_item_db = session.get(MenuItem, menu_item_id)
     if not menu_item_db:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Menu item not found"
         )
+
+    # Suppression
     session.delete(menu_item_db)
     session.commit()
     return True
