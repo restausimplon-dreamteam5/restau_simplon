@@ -62,8 +62,10 @@ def insert_user(
         raise insufficient_permissions_exception
 
     roles_db = find_corresponding_roles(new_user.roles, session)
-    hashed_password = bcrypt.hashpw(new_user.password.encode(), bcrypt.gensalt())
-    
+    # Sécurisation du mot de passe
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(new_user.password.encode("utf-8"), salt)
+
     user_db = User(
         first_name=new_user.first_name,
         surname=new_user.surname,
@@ -71,6 +73,7 @@ def insert_user(
         address=new_user.address,
         email=new_user.email,
         password=hashed_password.decode("utf-8"),
+        salt=salt.decode("utf-8"),
         roles=roles_db,
     )
     session.add(user_db)
@@ -95,6 +98,7 @@ def partial_update_user(
         raise insufficient_permissions_exception
 
     user_db = session.exec(select(User).where(User.id == id)).one()
+    user_salt = user_db.salt.encode("utf-8")
 
     if new_user.first_name:
         user_db.first_name = new_user.first_name
@@ -107,12 +111,13 @@ def partial_update_user(
     if new_user.address:
         user_db.address = new_user.address
     if new_user.password:
-        hashed_password = bcrypt.hashpw(new_user.password.encode(), bcrypt.gensalt())
+        # Sécurisation du mot de passe
+        hashed_password = bcrypt.hashpw(new_user.password.encode("utf-8"), user_salt)
         user_db.password = hashed_password.decode("utf-8")
     if new_user.roles:
         roles_db = find_corresponding_roles(new_user.roles, session)
         user_db.roles = roles_db
-        
+
     session.add(user_db)  # TODO: email unique exception
     session.commit()
     return user_db
@@ -129,8 +134,9 @@ def update_user(
         raise insufficient_permissions_exception
 
     user_db = session.exec(select(User).where(User.id == id)).one()
-
-    hashed_password = bcrypt.hashpw(new_user.password.encode(), bcrypt.gensalt())
+    # Sécurisation du mot de passe
+    user_salt = user_db.salt.encode("utf-8")
+    hashed_password = bcrypt.hashpw(new_user.password.encode("utf-8"), user_salt)
 
     user_db.first_name = new_user.first_name
     user_db.surname = new_user.surname
