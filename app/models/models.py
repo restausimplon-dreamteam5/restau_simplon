@@ -38,6 +38,7 @@ class User(SQLModel, table=True):
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(index=True, unique=True, max_length=320)
     password: str
+    salt: str
     created_at: datetime = Field(default_factory=datetime.now)
 
     roles: list[Role] = Relationship(link_model=Permission)
