@@ -62,17 +62,9 @@ def get_token_data(
 def login(
     logins: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep
 ) -> Token:
-    hashed_password = bcrypt.hashpw(logins.password.encode(), bcrypt.gensalt())
-    print(
-        f"{logins.password} --- {hashed_password.decode('utf-8')}"
-    )  # TODO: A supprimer: verif mdp hashé et salé
 
     try:
-        user = session.exec(
-            select(User)
-            .where(User.email == logins.username)
-            .where(User.password == hashed_password)
-        ).one()
+        user = session.exec(select(User).where(User.email == logins.username)).one()
     except:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -84,6 +76,15 @@ def login(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Identifiants invalides",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user_salt = user.salt.encode("utf-8")
+    hashed_password = bcrypt.hashpw(logins.password.encode("utf-8"), user_salt)
+    if hashed_password != user.password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Mot de passe invalide",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
