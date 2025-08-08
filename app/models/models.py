@@ -1,6 +1,7 @@
 # Import
 import uuid
-from sqlmodel import Field, Relationship, SQLModel, Column, Enum as smEnum
+from sqlmodel import Field, SQLModel, Relationship, Column, Enum as smEnum
+from typing import Optional, List
 from decimal import Decimal
 from enum import Enum
 from datetime import datetime
@@ -81,7 +82,7 @@ class OrderStatus(str, Enum):
     completed = "completed"
     cancelled = "cancelled"
 
-
+# Modele commande
 class Order(SQLModel, table=True):
     """Modèle de commande pour la base de données"""
 
@@ -92,9 +93,9 @@ class Order(SQLModel, table=True):
     order_date: datetime = Field(default_factory=datetime.now)
 
     user_id: uuid.UUID = Field(foreign_key="user_info.id")
+    details: List["OrderDetail"] = Relationship(back_populates="order")
 
-
-# Detail commande
+# Modele detail commande
 class OrderDetail(SQLModel, table=True):
     """Modèle de détail de commande pour la base de données"""
 
@@ -104,6 +105,9 @@ class OrderDetail(SQLModel, table=True):
 
     order_id: uuid.UUID = Field(foreign_key="order.id")
     item_id: uuid.UUID = Field(foreign_key="menu_item.id")
-
+    
     quantity: int = Field(gt=0, default=1)
-    unit_price: Decimal = Field(..., max_digits=8, decimal_places=2)
+    unit_price: Decimal = Field(..., max_digits=8, decimal_places=2) 
+
+    # Relation inverse avec Order
+    order: Optional[Order] = Relationship(back_populates="details")

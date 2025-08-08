@@ -21,7 +21,7 @@ class UserCreate(SQLModel):
         min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
     )
     # Adresse complète comme (46 rue des michels 44000 Nantes)
-    address: str | None = Field(max_length=200)
+    address: str | None = Field(default=None, max_length=200)
     email: EmailStr = Field(max_length=320)
     password: str
     roles: list[str]
@@ -131,13 +131,12 @@ class OrderDetailCreate(SQLModel):
     quantity: int = Field(default=1, gt=0)
 
 
-# Commande
-class OrderCreate(SQLModel):
-    """Schéma pour créer une commande"""
+class OrderDetailOut(SQLModel):
+    """Schéma de sortie pour un article dans une commande"""
 
-    user_id: UUID
-    order_date: datetime = Field(default_factory=datetime.now)
-    items: List[OrderDetailCreate]
+    item_id: UUID
+    quantity: int
+    unit_price: Decimal
 
 
 class OrderOut(SQLModel):
@@ -150,6 +149,19 @@ class OrderOut(SQLModel):
     order_date: datetime
     status: OrderStatus
     total_amount: Decimal
+
+
+class OrderWithDetailsOut(OrderOut):
+    items: list[OrderDetailOut]
+
+
+# Commande
+class OrderCreate(SQLModel):
+    """Schéma pour créer une commande"""
+
+    user_id: UUID
+    order_date: datetime = Field(default_factory=datetime.now)
+    items: List[OrderDetailCreate]
 
 
 class OrderStatusUpdate(SQLModel):
