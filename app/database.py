@@ -132,7 +132,7 @@ def create_base_data():
         session.commit()
 
     # # Création des nouveaux user
-    admin = create_an_admin()
+    admin = create_default_admin()
     staff = create_a_staff()
     client = create_a_client()
 
@@ -142,25 +142,23 @@ def create_base_data():
         session.add(client)
         session.commit()
 
-
-def create_an_admin() -> User:
+def create_default_admin() -> User:
     admin_role = Role(role="admin")
-    admin_password = "admin"
+    admin_password = os.environ["ADMIN_PASSWORD"]
     admin_salt = bcrypt.gensalt()
     admin_hashed_password = bcrypt.hashpw(admin_password.encode("utf-8"), admin_salt)
 
     admin = User(
-        first_name="michelle",
-        surname="admin",
-        email="admin@restau-simplon.com",
+        first_name="to_modify",
+        surname="to_modify",
+        email=os.environ["ADMIN_EMAIL"],
         password=admin_hashed_password.decode("utf-8"),
         salt=admin_salt.decode("utf-8"),
-        phone="0801020304",
+        phone="0600000000",
         address=None,
         roles=[admin_role],
     )
     return admin
-
 
 def create_a_staff() -> User:
     staff_role = Role(role="staff")
