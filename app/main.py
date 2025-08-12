@@ -2,12 +2,16 @@ from fastapi import FastAPI
 from fastapi.security import OAuth2PasswordBearer
 from .database import create_db_and_tables
 from app.routes import menu_item, user, order, login, roles
+import dotenv
+dotenv.load_dotenv()
+
+# TODO: vérifier la présence de toutes les clés 
 
 app = FastAPI()
 
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
+# @app.on_event("startup")
+# def on_startup():
+#     create_db_and_tables()
 
 app.include_router(login.router)
 app.include_router(menu_item.router)

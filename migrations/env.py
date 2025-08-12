@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
+from sqlalchemy import create_engine, engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
@@ -8,6 +8,17 @@ from alembic import context
 from sqlmodel import SQLModel
 
 from app.models.models import User, MenuItem
+
+import os
+import sys
+import dotenv
+
+dotenv.load_dotenv()
+
+DB_URI = os.getenv("DB_URI")
+if DB_URI == None:
+    print("DB_URI manquante")
+    sys.exit()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -30,6 +41,8 @@ target_metadata = SQLModel.metadata
 # ... etc.
 
 
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -42,8 +55,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
-
+    url = config.set_main_option("sqlalchemy.url", DB_URI)
+    
     naming_convention = {
         "ix": "ix_%(table_name)_%(column_0_label)s",  # Added table_name for more uniqueness
         "uq": "uq_%(table_name)_%(column_0_name)s",
@@ -73,6 +86,8 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    config.set_main_option('sqlalchemy.url', DB_URI)
+    
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
