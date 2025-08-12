@@ -10,12 +10,15 @@ from sqlmodel import create_engine, select, SQLModel, Session
 import json
 import random
 import bcrypt
+import dotenv
 
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+dotenv.load_dotenv()
+DB_URI = os.getenv("DB_URI")
+if DB_URI == None:
+    print("DB_URI manquante")
+    sys.exit()
 
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
+engine = create_engine(DB_URI, echo=True)
 
 
 def create_db_and_tables():
