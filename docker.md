@@ -22,15 +22,23 @@ python app/database.py
 Contruire l'image de l'api
 
 ```sh 
-docker build -t restau-simplon-api:test .
+docker build -t ghcr.io/restausimplon-dreamteam5/restau-simplon-api:0.0.1 .
 ```
 
 Lancer l'api
 
 ```sh
-docker run -d --name api-restau -p 8000:8000 restau-simplon-api:test
+docker run -d --name api-restau -p 8000:8000 ghcr.io/restausimplon-dreamteam5/restau-simplon-api:0.0.1
 ```
 
+Mettre l'image sur github
+
+```sh
+docker login ghcr.io -u thomas-lefloch -p {password}
+docker build -t ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1 .
+docker push ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+docker pull ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+```
 
 Profit $$$
 
