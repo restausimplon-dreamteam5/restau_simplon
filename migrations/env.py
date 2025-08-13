@@ -7,7 +7,10 @@ from alembic import context
 
 from sqlmodel import SQLModel
 
-from app.models.models import User, MenuItem
+try:
+    from app.models.models import User, MenuItem
+except:
+    pass
 
 import os
 import sys

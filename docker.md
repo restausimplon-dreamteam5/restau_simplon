@@ -40,6 +40,11 @@ docker push ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 docker pull ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 ```
 
-Profit $$$
+Faire communiquer les docker avec un network
 
-TODO: network
+```sh
+docker network create bla
+docker network connect bla {nom_conteneur}
+docker run --network bla {nom_conteneur}
+```
+Profit $$$
