@@ -40,8 +40,12 @@ docker push ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 docker pull ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 ```
 
-Faire communiquer les docker avec un network
+Lancer docker compose (en précisant le fichier yaml à utiliser)
+```sh
+docker compose -f compose.test.yaml up
+```
 
+Faire communiquer les docker avec un network
 ```sh
 docker network create bla
 docker network connect bla {nom_conteneur}
