@@ -1,0 +1,25 @@
+services:
+
+  db:
+    container_name: restausimplon-db
+    image: postgres:17.5-alpine3.22
+    ports:
+      - 5432:5432
+    env_file:
+       - .db.env
+    # TODO: Possibilité de préciser que les variables env viennent du fichier ci-dessus.
+    # environment:
+    #   - POSTGRES_USER=${POSTGRES_USER}
+    #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    #   - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - restausimplon-data:/var/lib/postgresql/data
+
+
+
+volumes:
+  restausimplon-data:
+  
+
+
+    
