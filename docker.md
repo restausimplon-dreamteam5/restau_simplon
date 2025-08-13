@@ -35,9 +35,11 @@ Mettre l'image sur github
 
 ```sh
 docker login ghcr.io -u thomas-lefloch -p {password}
-docker build -t ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1 .
+docker build -f app.Dockerfile -t ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1 .
 docker push ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 docker pull ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+
+docker build -f migration.Dockerfile -t ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1 .
 ```
 
 Lancer docker compose (en précisant le fichier yaml à utiliser)
