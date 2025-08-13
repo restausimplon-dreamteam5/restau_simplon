@@ -40,6 +40,12 @@ docker push ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 docker pull ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 ```
 
+Lancer docker compose (en précisant le fichier yaml à utiliser)
+
+```sh
+docker compose -f compose.test.yaml up
+```
+
 Profit $$$
 
 TODO: network
