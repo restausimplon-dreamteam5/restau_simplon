@@ -28,12 +28,38 @@ services:
     environment:
       # TODO: Créer un utilisateur spécial pour l'application avec les bons droits
       - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      # L'uri séparer aurait été user friendlier
+      # - DB_PROTOCOL=postgresql+psycopg
+      # - DB_USER=${POSTGRES_USER}
+      # - DB_PASSWORD=${POSTGRES_PASSWORD}
+      # - DB_HOST=db
+      # - DB_PORT=${POSTGRES_PORT}
+      # - DB_DATABASE=${POSTGRES_DB}
     networks:
       - restausimplon-network
     depends_on:
       db:
         condition: service_healthy
+    
+  insert_data:
+    restart: no
+    container_name: restausimplon-data
+    image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+    environment:
+      # Uri séparer mieux
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    networks:
+      - restausimplon-network
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    # command: python database.py
+    # command: python /app/database.py
+    command: python app/database.py
 
+# BENJAMIN: restausimplon-network ou restausimplon_network ?
 networks:
   restausimplon-network:
     driver: bridge
