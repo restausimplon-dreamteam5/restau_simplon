@@ -42,15 +42,18 @@ docker pull ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
 docker build -f migration.Dockerfile -t ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1 .
 ```
 
-Lancer docker compose (en précisant le fichier yaml à utiliser)
-```sh
-docker compose -f compose.test.yaml up
-```
-
 Faire communiquer les docker avec un network
 ```sh
 docker network create bla
 docker network connect bla {nom_conteneur}
 docker run --network bla {nom_conteneur}
 ```
+
+
+Lancer docker compose (en précisant le fichier yaml à utiliser)
+```sh
+docker compose -f compose.test.yaml up
+```
+
+
 Profit $$$

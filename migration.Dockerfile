@@ -11,3 +11,4 @@ COPY migrations/ migrations/
 COPY alembic.ini .
 
 CMD alembic upgrade head
+# BENJAMIN: POourquoi ?  CMD ["alembic", "upgrade", "head"]

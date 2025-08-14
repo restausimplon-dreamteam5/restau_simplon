@@ -5,7 +5,6 @@ services:
     image: postgres:17.5-alpine3.22
     ports:
       - "${LOCAL_PORT}:${POSTGRES_PORT}"
-   
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -13,11 +12,31 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
     volumes:
       - restausimplon-data:/var/lib/postgresql/data
+    networks:
+      - restausimplon-network
+    healthcheck:
+      # BENJAMIN: Moyen facile de prévenir quelqu'un en cas de crash sévère ?
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  migration:
+    restart: no
+    container_name: restausimplon-migration
+    image: ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1
+    environment:
+      # TODO: Créer un utilisateur spécial pour l'application avec les bons droits
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+    networks:
+      - restausimplon-network
+    depends_on:
+      db:
+        condition: service_healthy
 
-
-
-
+networks:
+  restausimplon-network:
+    driver: bridge
 
 volumes:
   restausimplon-data:
