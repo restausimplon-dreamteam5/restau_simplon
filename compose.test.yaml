@@ -42,6 +42,7 @@ services:
         condition: service_healthy
     
   insert_data:
+    profiles: [test]
     restart: no
     container_name: restausimplon-data
     image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
@@ -57,6 +58,26 @@ services:
         condition: service_completed_successfully
     command: python app/database.py
 
+  api: 
+    container_name: restausimplon-api
+    image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+    # BENJAMIN : est-ce que le unless-stopped redemarre après un redemarrage pc / always en prod
+    restart: unless-stopped
+    ports:
+      - ${API_PORT}:8000
+    environment:
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    networks:
+      - restausimplon-network
+    depends_on:
+      db:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+
 # BENJAMIN: restausimplon-network ou restausimplon_network ?
 networks:
   restausimplon-network:
@@ -64,7 +85,14 @@ networks:
 
 volumes:
   restausimplon-data:
-  
+
+
+
+
+
+
+
+
 
 
     
