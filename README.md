@@ -6,9 +6,13 @@
 - César Gattano
   
 ## 📌 Contexte professionnel
-**RestauSimplon**, un restaurant en pleine modernisation, souhaite digitaliser la gestion de ses commandes pour éviter les erreurs de communication et accélérer leur traitement.
-
-En tant que développeurs backend, notre mission a été de concevoir une **API REST complète sous FastAPI** permettant de gérer les articles du menu, les clients et les commandes. Une fois développé, l'application et sa base de données ont été conteneurisées puis un processus CI/CD incluant des pipelines de tests ont été mis en place.
+Vous êtes développeur·euse backend au sein d’une start‑up tech spécialisée dans les solutions métier.
+Votre nouveau client, RestauSimplon, souhaite digitaliser la gestion de ses commandes.
+Aujourd’hui, tout se fait sur papier : erreurs fréquentes et temps de traitement élevés.
+Votre mission consiste à réaliser une API REST complète sous FastAPI pour gérer les articles du menu, les clients et les commandes, tout en intégrant :
+- Authentification/Autorisation par jetons (JWT).
+- Conteneurisation via Docker & Docker Compose.
+- CI/CD & tests automatisés (GitHub Actions ou GitLab CI, pytest).
 
 ## 🚀 Présentation des fonctionnalités
 - Gestion des **articles du menu** (CRUD)
@@ -16,8 +20,6 @@ En tant que développeurs backend, notre mission a été de concevoir une **API 
 - Gestion des **commandes** avec suivi du statut au fur et à mesure du traitement
 - **Authentification & Autorisation** à l'aide de jetons JWT
 - **Conteneurisation** avec Docker et Docker Compose
-- **Tests automatisés** avec pytest
-- **CI/CD** via GitHub Actions
 
 ## 🛠 Stack technique
 - **Langage** : Python 3.12
@@ -27,8 +29,6 @@ En tant que développeurs backend, notre mission a été de concevoir une **API 
 - **Migrations BDD** : Alembic
 - **Authentification & Autorisation** : OAuth2 Password avec access & refresh tokens JWT 
 - **Conteneurisation** : Docker & Docker Compose
-- **Tests** : pytest
-- **CI/CD** : GitHub Actions
 
 ## 📦 Installation & Utilisation
 
@@ -50,19 +50,41 @@ source .venv/bin/activate  # sous Linux/Mac
 pip install -r requirements.txt
 ```
 
+### Variables d'environnement
+Les variables d'environnement sont décrites dans le fichier [.env.example](.env.example)
+
 ### 4️⃣ Lancer l'application (local)
 ```bash
+# Avec fastapi
 fastapi dev app/main.py
-```
 
+# Avec uvicorn
+uvicorn app.main:app --port 8000
+```
 API disponible sur [http://localhost:8000](http://localhost:8000)  
 Documentation interactive : [Swagger UI](http://localhost:8000/docs)  
 Documentation interactive : [OpenAPI UI](http://localhost:8000/redoc)
 
+### Construire la base de donnée
+```sh
+alembic upgrade head
+```
+
+### Insérer les données de tests
+```sh
+python app/database.py
+```
+N'oubliez pas les variables d'environnement:
+- ADMIN_EMAIL
+- ADMIN_PASSWORD
+Elles servent à définir l'utilisateur admin pour les données de tests
+
 ## 🐳 Dockerisation
 ### Lancer l'application avec Docker Compose
+/!\ ne pas oublier les variables d'environnement
+
 ```bash
-docker-compose up --build
+docker compose -f compose.test.yaml up
 ```
 
 Cela lancera :
@@ -70,24 +92,17 @@ Cela lancera :
 - L'éxecution des migrations de la base
 - L'API
 
-## 🧪 Lancement des tests
+Pour lancer l'environnement production
 ```bash
-pytest
+docker compose -f compose.prod.yaml up
 ```
 
+## 🧪 Lancement des tests
+
 ## 🔄 CI/CD
-Un pipeline **GitHub Actions** est configuré pour :
-- Installer les dépendances
-- Lancer les tests unitaires
-- Construire et publier l'image Docker
+
 
 ## Arborescence du projet
-
-## 💡 Résumé des points forts
-- API REST complète avec **sécurité intégrée**
-- **Scalable** et **prête pour la production**
-- **Conteneurisation** facilitant le déploiement
-- **Automatisation** avec CI/CD
 
 ## 📄 Licence
 Ce projet est sous licence MIT — voir le fichier [LICENSE](LICENSE) pour plus d'informations.
