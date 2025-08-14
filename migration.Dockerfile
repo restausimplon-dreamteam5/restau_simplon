@@ -6,9 +6,12 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY migrations/ migrations/
+RUN useradd -m appuser
+USER appuser
 
-COPY alembic.ini .
+COPY --chown=appuser:appuser migrations/ migrations/
 
+COPY --chown=appuser:appuser alembic.ini .
+    
 CMD alembic upgrade head
 # BENJAMIN: POourquoi ?  CMD ["alembic", "upgrade", "head"]

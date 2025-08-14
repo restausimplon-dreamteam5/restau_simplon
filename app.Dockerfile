@@ -3,15 +3,16 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 
 
-# TODO: privilèges utilisateurs
-
 WORKDIR /code
 
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app/ app/
+RUN useradd -m appuser
+USER appuser
+
+COPY --chown=appuser:appuser app/ app/
 
 EXPOSE 8000
 
