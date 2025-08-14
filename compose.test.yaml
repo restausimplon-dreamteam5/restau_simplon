@@ -1,11 +1,10 @@
 services:
 
   db:
-    # BENJAMIN: limiter la taille sur disque // Utile ?
     container_name: restausimplon-db
     image: postgres:17.5-alpine3.22
     ports:
-      - "${LOCAL_PORT}:${POSTGRES_PORT}"
+      - ${LOCAL_DB_PORT}:${POSTGRES_PORT}
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -16,7 +15,6 @@ services:
     networks:
       - restausimplon-network
     healthcheck:
-      # BENJAMIN: Moyen facile de prévenir quelqu'un en cas de crash sévère ?
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
@@ -28,7 +26,7 @@ services:
     image: ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1
     environment:
       # TODO: Créer un utilisateur spécial pour l'application avec les bons droits
-      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
       # L'uri séparer aurait été user friendlier
       # - DB_PROTOCOL=postgresql+psycopg
       # - DB_USER=${POSTGRES_USER}
@@ -49,7 +47,7 @@ services:
     image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
     environment:
       # Uri séparer mieux
-      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     networks:
@@ -62,27 +60,33 @@ services:
   api: 
     container_name: restausimplon-api
     image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
-    # BENJAMIN : est-ce que le unless-stopped redemarre après un redemarrage pc / always en prod
     restart: unless-stopped
     ports:
-      - ${API_PORT}:8000
+      - ${LOCAL_API_PORT}:8000
     environment:
-      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_ALGORITHM=${JWT_ALGORITHM}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
     networks:
       - restausimplon-network
+      - outside
     depends_on:
       db:
         condition: service_healthy
       migration:
         condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 512M
 
-# BENJAMIN: restausimplon-network ou restausimplon_network ?
+
 networks:
   restausimplon-network:
     driver: bridge
+  outside:
 
 volumes:
   restausimplon-data:

@@ -1,0 +1,87 @@
+services:
+
+  db:
+    container_name: restausimplon-db
+    image: postgres:17.5-alpine3.22
+    ports:
+      - ${LOCAL_DB_PORT}:${POSTGRES_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    volumes:
+      - restausimplon-data:/var/lib/postgresql/data
+    networks:
+      - restausimplon-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    restart: no
+    container_name: restausimplon-migration
+    image: ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1
+    environment:
+      # TODO: Créer un utilisateur spécial pour l'application avec les bons droits
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
+      # L'uri séparer aurait été user friendlier
+      # - DB_PROTOCOL=postgresql+psycopg
+      # - DB_USER=${POSTGRES_USER}
+      # - DB_PASSWORD=${POSTGRES_PASSWORD}
+      # - DB_HOST=db
+      # - DB_PORT=${POSTGRES_PORT}
+      # - DB_DATABASE=${POSTGRES_DB}
+    networks:
+      - restausimplon-network
+    depends_on:
+      db:
+        condition: service_healthy
+    
+  api: 
+    container_name: restausimplon-api
+    image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+    restart: unless-stopped
+    ports:
+      - ${LOCAL_API_PORT}:8000
+    environment:
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    networks:
+      - restausimplon-network
+      - outside
+    depends_on:
+      db:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 512M
+
+
+networks:
+  restausimplon-network:
+    driver: bridge
+    internal: true 
+  outside:
+
+volumes:
+  restausimplon-data:
+
+
+
+
+
+
+
+
+
+
+    

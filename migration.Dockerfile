@@ -14,4 +14,3 @@ COPY --chown=appuser:appuser migrations/ migrations/
 COPY --chown=appuser:appuser alembic.ini .
     
 CMD alembic upgrade head
-# BENJAMIN: POourquoi ?  CMD ["alembic", "upgrade", "head"]
