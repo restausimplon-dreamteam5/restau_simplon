@@ -55,8 +55,6 @@ services:
     depends_on:
       migration:
         condition: service_completed_successfully
-    # command: python database.py
-    # command: python /app/database.py
     command: python app/database.py
 
 # BENJAMIN: restausimplon-network ou restausimplon_network ?
