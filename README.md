@@ -1,11 +1,11 @@
 # 🍽️ RestauSimplon API — Digitalisation des commandes
 
-## 👨‍💻 Auteurs
+## 👨‍🍳​👨‍🍳​👨‍🍳​ Auteurs
 - Thomas Lefloch
 - Jawad Berrhili
 - César Gattano
   
-## 📌 Contexte professionnel
+## 🌮 Contexte professionnel
 Vous êtes développeur·euse backend au sein d’une start‑up tech spécialisée dans les solutions métier.
 Votre nouveau client, RestauSimplon, souhaite digitaliser la gestion de ses commandes.
 Aujourd’hui, tout se fait sur papier : erreurs fréquentes et temps de traitement élevés.
@@ -14,14 +14,14 @@ Votre mission consiste à réaliser une API REST complète sous FastAPI pour g
 - Conteneurisation via Docker & Docker Compose.
 - CI/CD & tests automatisés (GitHub Actions ou GitLab CI, pytest).
 
-## 🚀 Présentation des fonctionnalités
+## 🥗 Présentation des fonctionnalités
 - Gestion des **articles du menu** (CRUD)
 - Gestion des **clients** (CRUD)
 - Gestion des **commandes** avec suivi du statut au fur et à mesure du traitement
 - **Authentification & Autorisation** à l'aide de jetons JWT
 - **Conteneurisation** avec Docker et Docker Compose
 
-## 🛠 Stack technique
+## 🍛 Stack technique
 - **Langage** : Python 3.12
 - **Framework** : FastAPI
 - **ORM** : SQLModel
@@ -30,7 +30,7 @@ Votre mission consiste à réaliser une API REST complète sous FastAPI pour g
 - **Authentification & Autorisation** : OAuth2 Password avec access & refresh tokens JWT 
 - **Conteneurisation** : Docker & Docker Compose
 
-## 📦 Installation & Utilisation
+## 🍔 Installation & Utilisation
 
 ### 1️⃣ Cloner le dépôt
 ```bash
@@ -65,12 +65,12 @@ API disponible sur [http://localhost:8000](http://localhost:8000)
 Documentation interactive : [Swagger UI](http://localhost:8000/docs)  
 Documentation interactive : [OpenAPI UI](http://localhost:8000/redoc)
 
-### Construire la base de donnée
+### 5️⃣ Construire la base de donnée
 ```sh
 alembic upgrade head
 ```
 
-### Insérer les données de tests
+### 6️⃣ Insérer les données de tests
 ```sh
 python app/database.py
 ```
@@ -79,7 +79,7 @@ N'oubliez pas les variables d'environnement:
 - ADMIN_PASSWORD
 Elles servent à définir l'utilisateur admin pour les données de tests
 
-## 🐳 Dockerisation
+## 🍝 Dockerisation
 ### Lancer l'application avec Docker Compose
 /!\ ne pas oublier les variables d'environnement
 
@@ -97,12 +97,12 @@ Pour lancer l'environnement production
 docker compose -f compose.prod.yaml up
 ```
 
-## 🧪 Lancement des tests
+## 🥘 Lancement des tests
 
-## 🔄 CI/CD
+## 🥙 CI/CD
 
 
-## Arborescence du projet
+## 🍕 Arborescence du projet
 
-## 📄 Licence
+## 🥤 Licence
 Ce projet est sous licence MIT — voir le fichier [LICENSE](LICENSE) pour plus d'informations.
