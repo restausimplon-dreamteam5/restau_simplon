@@ -2,7 +2,7 @@ import os, sys
 import pytest
 
 sys.path.append(os.getcwd())
-from app.schemas.schemas import MenuItemCreate, MenuCategory
+from app.schemas.schemas import MenuItemCreate, MenuItemUpdate
 from decimal import Decimal
 from pydantic import ValidationError
 
@@ -24,9 +24,15 @@ def correct_menu_item_example() -> dict:
     }
 
 
-def test_MenuItemCreate_init_correct(correct_menu_item_example: dict):
+testschemas = [(MenuItemCreate), (MenuItemUpdate)]
+
+
+@pytest.mark.parametrize(
+    "schema", testschemas, ids=["MenuItemCreate", "MenuItemUpdate"]
+)
+def test_MenuItemCreate_init_correct(correct_menu_item_example: dict, schema):
     # Act: Exécution de la fonction testée
-    menu_item = MenuItemCreate(**correct_menu_item_example)
+    menu_item = schema(**correct_menu_item_example)
 
     # Assert: Évaluation de la conformité du résultat
     assert menu_item.name == correct_menu_item_example["name"]
@@ -36,7 +42,10 @@ def test_MenuItemCreate_init_correct(correct_menu_item_example: dict):
     assert menu_item.stock == correct_menu_item_example["stock"]
 
 
-def test_MenuItemCreate_init_too_long_name(correct_menu_item_example: dict):
+@pytest.mark.parametrize(
+    "schema", testschemas, ids=["MenuItemCreate", "MenuItemUpdate"]
+)
+def test_MenuItemCreate_init_too_long_name(correct_menu_item_example: dict, schema):
     # Arrange: État initial de l'environnement du test
     correct_menu_item_example["name"] = (
         "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890extra_characters"
@@ -44,8 +53,7 @@ def test_MenuItemCreate_init_too_long_name(correct_menu_item_example: dict):
 
     # Act: Exécution de la fonction testée
     with pytest.raises(ValidationError) as excinfo:
-        menu_item = MenuItemCreate(**correct_menu_item_example)
-        pass
+        menu_item = schema(**correct_menu_item_example)
 
     # Assert: Évaluation de la conformité du résultat
     assert "String should have at most 100 characters" in str(excinfo.value)
