@@ -2,7 +2,7 @@ import os, sys
 import pytest
 
 sys.path.append(os.getcwd())
-from app.schemas.schemas import MenuItemCreate, MenuItemUpdate
+from app.schemas.schemas import MenuItemCreate, MenuItemUpdate, MenuItemOut
 from decimal import Decimal
 from pydantic import ValidationError
 
@@ -24,17 +24,22 @@ def correct_menu_item_example() -> dict:
     }
 
 
-testschemas = [(MenuItemCreate), (MenuItemUpdate)]
-
-
 @pytest.mark.parametrize(
-    "schema", testschemas, ids=["MenuItemCreate", "MenuItemUpdate"]
+    "schema",
+    [(MenuItemCreate), (MenuItemUpdate), (MenuItemOut)],
+    ids=["MenuItemCreate", "MenuItemUpdate", "MenuItemOut"],
 )
 def test_MenuItemCreate_init_correct(correct_menu_item_example: dict, schema):
+    # Arrange: État initial de l'environnement de test
+    if schema is MenuItemOut:
+        correct_menu_item_example["id"] = "46351949-8598-45c0-9fd5-2b0ec3ac3b3c"
+
     # Act: Exécution de la fonction testée
     menu_item = schema(**correct_menu_item_example)
 
     # Assert: Évaluation de la conformité du résultat
+    if schema is MenuItemOut:
+        assert str(menu_item.id) == correct_menu_item_example["id"]
     assert menu_item.name == correct_menu_item_example["name"]
     assert menu_item.price == correct_menu_item_example["price"]
     assert menu_item.category == correct_menu_item_example["category"]
@@ -43,7 +48,9 @@ def test_MenuItemCreate_init_correct(correct_menu_item_example: dict, schema):
 
 
 @pytest.mark.parametrize(
-    "schema", testschemas, ids=["MenuItemCreate", "MenuItemUpdate"]
+    "schema",
+    [(MenuItemCreate), (MenuItemUpdate)],
+    ids=["MenuItemCreate", "MenuItemUpdate"],
 )
 def test_MenuItemCreate_init_too_long_name(correct_menu_item_example: dict, schema):
     # Arrange: État initial de l'environnement du test
