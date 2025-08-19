@@ -24,7 +24,7 @@ def find_corresponding_roles(roles: list[str], session: SessionDep):
     for role in roles:
         try:
             res.append(session.exec(select(Role).where(Role.role == role)).one())
-        except:
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Role '{role}' n'existe pas",
@@ -59,7 +59,7 @@ def get_user_by_id(
 
     try:
         return session.exec(select(User).where(User.id == id)).one()
-    except:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
@@ -124,7 +124,7 @@ def partial_update_user(
     user_db = None
     try:
         user_db = session.exec(select(User).where(User.id == id)).one()
-    except:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     user_salt = user_db.salt.encode("utf-8")
@@ -169,7 +169,7 @@ def update_user(
     user_db = None
     try:
         user_db = session.exec(select(User).where(User.id == id)).one()
-    except:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     # Sécurisation du mot de passe
@@ -206,7 +206,7 @@ def delete_user(
 
     try:
         user_to_delete = session.exec(select(User).where(User.id == id)).one()
-    except:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     session.delete(user_to_delete)

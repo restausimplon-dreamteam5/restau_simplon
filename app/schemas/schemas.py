@@ -7,7 +7,6 @@ from pydantic import EmailStr
 from app.models.models import MenuCategory, Role
 from sqlmodel import SQLModel, Field
 from uuid import UUID
-from datetime import datetime
 from typing import List
 from app.models.models import OrderStatus
 
@@ -25,7 +24,8 @@ class UserCreate(SQLModel):
     email: EmailStr = Field(max_length=320)
     password: str
     roles: list[str]
-    
+
+
 class ClientCreate(SQLModel):
     first_name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
@@ -36,6 +36,7 @@ class ClientCreate(SQLModel):
     address: str | None = Field(default=None, max_length=200)
     email: EmailStr = Field(max_length=320)
     password: str
+
 
 class UserPost(SQLModel):
     first_name: str = Field(max_length=50)
@@ -48,7 +49,8 @@ class UserPost(SQLModel):
     email: EmailStr = Field(max_length=320)
     password: str
     roles: list[str]
-    
+
+
 class UserPatch(SQLModel):
     first_name: str | None = Field(default=None, max_length=50)
     surname: str | None = Field(default=None, max_length=50)

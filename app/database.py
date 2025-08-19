@@ -1,16 +1,17 @@
-import os, sys
-
-sys.path.append(os.getcwd())
+import os
+import sys
 from app.models.models import MenuItem, User, Order, OrderDetail, OrderStatus, Role
 from app.schemas.schemas import MenuItemCreate, UserCreate
 from app.crud.menu_items import create_menu_item_in_db
 from app.crud.user_info import create_user_info_in_db
-from app.crud.order import create_order_detail_in_db, create_order_in_db
+from app.crud.order import create_order_in_db
 from sqlmodel import create_engine, select, SQLModel, Session
 import json
 import random
 import bcrypt
 import dotenv
+
+sys.path.append(os.getcwd())
 
 dotenv.load_dotenv()
 DB_URI = os.getenv("DB_URI")
@@ -142,6 +143,7 @@ def create_base_data():
         session.add(client)
         session.commit()
 
+
 def create_default_admin() -> User:
     admin_role = Role(role="admin")
     admin_password = os.environ["ADMIN_PASSWORD"]
@@ -159,6 +161,7 @@ def create_default_admin() -> User:
         roles=[admin_role],
     )
     return admin
+
 
 def create_a_staff() -> User:
     staff_role = Role(role="staff")

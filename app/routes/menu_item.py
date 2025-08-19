@@ -1,7 +1,6 @@
 from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, status, Depends
 from typing import Annotated
-from decimal import Decimal
 from sqlmodel import select
 from app.routes.login import extract_token_data, insufficient_permissions_exception
 from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate, TokenData
@@ -59,8 +58,10 @@ def read_menu_items(
 
     **Args**:
     * **session** (*SessionDep*): La session communicante avec la BDD
-    * **offset** (*int*, optional): Décalage pour le premier article à lire. Par défaut: 0.
-    * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées. Par défaut: 100.
+    * **offset** (*int*, optional): Décalage pour le premier article à lire.
+        Par défaut: 0.
+    * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées.
+        Par défaut: 100.
 
     *Returns*:
     * *list[MenuItemOut]*: Liste des informations sortantes

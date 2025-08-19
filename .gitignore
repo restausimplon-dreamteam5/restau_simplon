@@ -212,6 +212,3 @@ user_info_generator.py
 
 # Tous les fichiers environnement
 *.env
-
-# Configuration lié à VSCode
-.vscode

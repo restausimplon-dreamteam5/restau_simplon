@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
 
@@ -10,7 +9,7 @@ from app.schemas.schemas import Token, TokenData
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
 import bcrypt
-import os 
+import os
 
 router = APIRouter(prefix="/login", tags=["Login"])
 
@@ -53,7 +52,7 @@ def login(
 
     try:
         user = session.exec(select(User).where(User.email == logins.username)).one()
-    except:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Identifiants invalides",
