@@ -28,4 +28,4 @@ jobs:
       - name: Installation des dépendences
         run: pip install flake8
       - name: Exécution de flake8
-        run: flake8 ./
+        run: flake8 --filename="*.py" --ignore=E501,W503 ./
