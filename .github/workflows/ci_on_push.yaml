@@ -1,4 +1,4 @@
-name: Qualité de code 2
+name: Qualité de code
 
 on: push
 
@@ -91,7 +91,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Installation de python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -101,5 +101,4 @@ jobs:
       - name: Lancement des tests unitaires
         run: |
           export PYTHONPATH=$PYTHONPATH:`pwd`
-          echo $PYTHONPATH
           pytest tests/units/
