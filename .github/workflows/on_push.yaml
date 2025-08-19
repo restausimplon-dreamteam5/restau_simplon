@@ -100,5 +100,3 @@ jobs:
 
       - name: Lancement des tests unitaires
         run: pytest tests/units/
-#          export PYTHONPATH=$PYTHONPATH:`pwd`
-
