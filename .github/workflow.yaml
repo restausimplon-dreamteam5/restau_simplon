@@ -14,7 +14,7 @@ jobs:
       - name: Mise en place de Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Installation de black
         run: pip install black
@@ -33,7 +33,7 @@ jobs:
       - name: Mise en place de Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Installation de isort
         run: pip install isort
@@ -71,10 +71,30 @@ jobs:
       - name: Installation de python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Installation des dépendances
         run: pip install --no-cache-dir -r requirements.txt
 
       - name: Lancement de mypy
         run: mypy .
+
+  #######
+  unit-tests:
+    name: Exécution des tests unitaires
+    needs: [black, isort, flake8, mypy]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Installation de python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installation des dépendances
+        run: pip install --no-cache-dir -r requirements.txt
+
+      - name: Lancement des tests unitaires
+        run: pytest tests/units/
