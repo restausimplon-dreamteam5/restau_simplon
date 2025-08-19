@@ -6,8 +6,6 @@ from enum import Enum
 from typing import List, Optional
 
 from pydantic import EmailStr
-from sqlmodel import Column
-from sqlmodel import Enum as smEnum
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -66,12 +64,6 @@ class MenuItem(SQLModel, table=True):
     name: str = Field(..., unique=True, index=True, max_length=100)
     price: Decimal = Field(..., max_digits=8, decimal_places=2)
     category: MenuCategory = Field(...)
-    # category: MenuCategory = Field(
-    #     sa_column=Column(
-    #         smEnum(MenuCategory, name="category", create_type=True),
-    #         nullable=False,
-    #     ),
-    # )
     description: str | None = Field(None)
     stock: int = Field(default=0, ge=0)
 

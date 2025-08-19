@@ -1,6 +1,5 @@
 import dotenv
 from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
 
 from app.routes import login, menu_item, order, roles, user
 

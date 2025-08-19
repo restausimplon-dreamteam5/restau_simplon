@@ -5,14 +5,13 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
-from sqlmodel import Session, select
+from sqlmodel import select
 
 from app.deps import SessionDep
 from app.models.models import MenuItem, Order, OrderDetail, OrderStatus
 from app.routes.login import extract_token_data, insufficient_permissions_exception
 from app.schemas.schemas import (
     OrderCreate,
-    OrderDetailCreate,
     OrderDetailOut,
     OrderOut,
     OrderStatusUpdate,

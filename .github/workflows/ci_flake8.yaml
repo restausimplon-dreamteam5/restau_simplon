@@ -1,0 +1,31 @@
+name: Flake8 CI
+on:
+  push:
+    branches: [main, dev, "feature/ci_flake8"]
+jobs:
+  salut:
+    name: Salutation
+    runs-on: ubuntu-24.04
+    steps:
+      - name: salut l'ami
+        env:
+          MY_VAR: Salut! Je suis
+          FIRST_NAME: Mona
+          MIDDLE_NAME: The
+          LAST_NAME: Octocat
+        run: |
+          echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
+  flake8:
+    name: Exécution de flake8
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v5
+      - name: Mise en place de python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installation des dépendences
+        run: pip install flake8
+      - name: Exécution de flake8
+        run: flake8 --filename="*.py" --ignore=E501,W503 --exclude=.venv,migrations,.pytest_cache ./

@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
 
@@ -61,8 +60,10 @@ def read_menu_items(
 
     **Args**:
     * **session** (*SessionDep*): La session communicante avec la BDD
-    * **offset** (*int*, optional): Décalage pour le premier article à lire. Par défaut: 0.
-    * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées. Par défaut: 100.
+    * **offset** (*int*, optional): Décalage pour le premier article à lire.
+        Par défaut: 0.
+    * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées.
+        Par défaut: 100.
 
     *Returns*:
     * *list[MenuItemOut]*: Liste des informations sortantes

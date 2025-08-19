@@ -1,5 +1,4 @@
 import os
-import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
@@ -54,7 +53,7 @@ def login(
 
     try:
         user = session.exec(select(User).where(User.email == logins.username)).one()
-    except:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Identifiants invalides",
