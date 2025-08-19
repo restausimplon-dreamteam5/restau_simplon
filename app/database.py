@@ -1,8 +1,7 @@
-import os
-import sys
-
 import json
+import os
 import random
+import sys
 
 import bcrypt
 import dotenv
