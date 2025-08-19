@@ -1,15 +1,14 @@
 # Import
-from datetime import datetime
 import uuid
+from datetime import datetime
 from decimal import Decimal
+from typing import List
+from uuid import UUID
 
 from pydantic import EmailStr
-from app.models.models import MenuCategory, Role
-from sqlmodel import SQLModel, Field
-from uuid import UUID
-from datetime import datetime
-from typing import List
-from app.models.models import OrderStatus
+from sqlmodel import Field, SQLModel
+
+from app.models.models import MenuCategory, OrderStatus, Role
 
 
 # User
