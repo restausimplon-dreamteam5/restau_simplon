@@ -2,6 +2,7 @@ import pytest
 
 from app.schemas.schemas import UserCreate
 
+
 @pytest.fixture
 def valid_UserCreate():
     return {
