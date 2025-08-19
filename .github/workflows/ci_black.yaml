@@ -2,9 +2,9 @@ name: black check
 
 on:
   push:
-    branches: [main, dev, 'feature/**']
+    branches: [dev, 'feature/**']
   pull_request:
-    branches: [main, dev, 'feature/**']
+    branches: [dev, 'feature/**']
 
 jobs:
   black:
