@@ -1,12 +1,14 @@
-from uuid import UUID
-from fastapi import APIRouter, HTTPException, Query, status, Depends
 from typing import Annotated
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import select
-from app.routes.login import extract_token_data, insufficient_permissions_exception
-from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate, TokenData
-from app.models.models import MenuItem, MenuCategory
+
 from app.crud.menu_items import create_menu_item_in_db
 from app.deps import SessionDep
+from app.models.models import MenuCategory, MenuItem
+from app.routes.login import extract_token_data, insufficient_permissions_exception
+from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate, TokenData
 
 router = APIRouter(prefix="/menu_items", tags=["Menu items"])
 

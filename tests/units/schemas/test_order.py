@@ -1,23 +1,20 @@
-import os, sys
+import pytest
 
-sys.path.append(os.getcwd())
-from app.schemas.schemas import OrderCreate, OrderDetailCreate
-from decimal import Decimal 
+from app.schemas.schemas import OrderCreate
 
-def test_OrderCreate_init_correct():
-    # Act : on instancie avec un user_id et 1 item
-    order = OrderCreate(
-        user_id="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-        items=[
-            OrderDetailCreate(
-                item_id="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-                quantity=3,
-            )
-        ],
-    )
 
-    # Assert : vérifications très simples
-    assert str(order.user_id) == "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+# Test fixture pour un ordre valide
+@pytest.fixture
+def valid_order() -> dict:
+    return {
+        "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        "items": [{"item_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "quantity": 3}],
+    }
+
+
+# Test pour vérifier la création d'une commande avec des données valides
+def test_order_create_minimal(valid_order: dict):
+    order = OrderCreate(**valid_order)
+    assert order.user_id
     assert len(order.items) == 1
-    assert str(order.items[0].item_id) == "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
     assert order.items[0].quantity == 3

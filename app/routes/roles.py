@@ -4,7 +4,6 @@ from sqlmodel import select
 from app.deps import SessionDep
 from app.models.models import Role
 
-
 router = APIRouter(prefix="/roles", tags=["Roles"])
 
 

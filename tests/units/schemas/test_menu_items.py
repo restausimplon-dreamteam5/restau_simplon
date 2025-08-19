@@ -1,10 +1,14 @@
-import os, sys
+import os
+import sys
+
 import pytest
 
 sys.path.append(os.getcwd())
-from app.schemas.schemas import MenuItemCreate, MenuItemUpdate, MenuItemOut
 from decimal import Decimal
+
 from pydantic import ValidationError
+
+from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate
 
 
 # Définition d'un article de menu correct et complet

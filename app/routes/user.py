@@ -1,8 +1,13 @@
-from typing import Annotated
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import Annotated
+
 import bcrypt
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
+
+from app.deps import SessionDep
+from app.models.models import Role, User
 from app.routes.login import extract_token_data, insufficient_permissions_exception
 from app.schemas.schemas import (
     ClientCreate,
@@ -12,9 +17,6 @@ from app.schemas.schemas import (
     UserPatch,
     UserPost,
 )
-from app.models.models import Role, User
-from app.deps import SessionDep
-from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(prefix="/users", tags=["User"])
 

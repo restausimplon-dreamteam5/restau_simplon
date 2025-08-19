@@ -1,19 +1,17 @@
 from logging.config import fileConfig
 
-from sqlalchemy import create_engine, engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
-
+from sqlalchemy import create_engine, engine_from_config, pool
 from sqlmodel import SQLModel
 
 try:
-    from app.models.models import User, MenuItem
+    from app.models.models import MenuItem, User
 except:
     pass
 
 import os
 import sys
+
 import dotenv
 
 dotenv.load_dotenv()
@@ -44,8 +42,6 @@ target_metadata = SQLModel.metadata
 # ... etc.
 
 
-
-
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -59,7 +55,7 @@ def run_migrations_offline() -> None:
 
     """
     url = config.set_main_option("sqlalchemy.url", DB_URI)
-    
+
     naming_convention = {
         "ix": "ix_%(table_name)_%(column_0_label)s",  # Added table_name for more uniqueness
         "uq": "uq_%(table_name)_%(column_0_name)s",
@@ -89,8 +85,8 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    config.set_main_option('sqlalchemy.url', DB_URI)
-    
+    config.set_main_option("sqlalchemy.url", DB_URI)
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

@@ -1,15 +1,18 @@
 import os
 import sys
-from app.models.models import MenuItem, User, Order, OrderDetail, OrderStatus, Role
-from app.schemas.schemas import MenuItemCreate, UserCreate
-from app.crud.menu_items import create_menu_item_in_db
-from app.crud.user_info import create_user_info_in_db
-from app.crud.order import create_order_in_db
-from sqlmodel import create_engine, select, SQLModel, Session
+
 import json
 import random
+
 import bcrypt
 import dotenv
+from sqlmodel import Session, SQLModel, create_engine, select
+
+from app.crud.menu_items import create_menu_item_in_db
+from app.crud.order import create_order_in_db
+from app.crud.user_info import create_user_info_in_db
+from app.models.models import MenuItem, Order, OrderDetail, OrderStatus, Role, User
+from app.schemas.schemas import MenuItemCreate, UserCreate
 
 sys.path.append(os.getcwd())
 

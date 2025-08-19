@@ -1,11 +1,12 @@
 # Import
 import uuid
-from sqlmodel import Field, SQLModel, Relationship
-from typing import Optional, List
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from datetime import datetime
+from typing import List, Optional
+
 from pydantic import EmailStr
+from sqlmodel import Field, Relationship, SQLModel
 
 
 # User

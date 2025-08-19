@@ -1,6 +1,7 @@
-from fastapi import FastAPI
-from app.routes import menu_item, user, order, login, roles
 import dotenv
+from fastapi import FastAPI
+
+from app.routes import login, menu_item, order, roles, user
 
 dotenv.load_dotenv()
 
