@@ -27,4 +27,4 @@ jobs:
           pip install isort
 
       - name: Run isort (check only)
-        run: isort . --check-only
+        run: isort . --check-only --profile black
