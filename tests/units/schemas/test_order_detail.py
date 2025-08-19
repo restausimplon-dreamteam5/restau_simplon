@@ -11,7 +11,7 @@ def valid_order_detail() -> dict:
         "quantity": 2,
     }
 
-
+# Test pour vérifier la création d'un détail de commande avec des données valides
 def test_OrderDetailCreate_init_correct(valid_order_detail: dict):
     # Act
     detail = OrderDetailCreate(**valid_order_detail)
@@ -20,7 +20,7 @@ def test_OrderDetailCreate_init_correct(valid_order_detail: dict):
     assert str(detail.item_id) == valid_order_detail["item_id"]
     assert detail.quantity == valid_order_detail["quantity"]
 
-
+# Test pour vérifier que la quantité doit être supérieure à 0
 def test_OrderDetailCreate_rejects_quantity_lt_1(valid_order_detail: dict):
     # Arrange
     valid_order_detail["quantity"] = 0

@@ -1,6 +1,7 @@
 import pytest
 from app.schemas.schemas import OrderCreate
 
+# Test fixture pour un ordre valide
 @pytest.fixture
 def valid_order() -> dict:
     return {
@@ -10,6 +11,7 @@ def valid_order() -> dict:
         ],
     }
 
+# Test pour vérifier la création d'une commande avec des données valides
 def test_order_create_minimal(valid_order: dict):
     order = OrderCreate(**valid_order)
     assert order.user_id
