@@ -16,10 +16,7 @@ import dotenv
 
 dotenv.load_dotenv()
 
-DB_URI = os.getenv("DB_URI")
-if DB_URI == None:
-    print("DB_URI manquante")
-    sys.exit()
+DB_URI = os.environ["DB_URI"]
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -54,8 +51,6 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.set_main_option("sqlalchemy.url", DB_URI)
-
     naming_convention = {
         "ix": "ix_%(table_name)_%(column_0_label)s",  # Added table_name for more uniqueness
         "uq": "uq_%(table_name)_%(column_0_name)s",
@@ -65,7 +60,7 @@ def run_migrations_offline() -> None:
     }
 
     context.configure(
-        url=url,
+        url=DB_URI,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},

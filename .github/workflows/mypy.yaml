@@ -1,0 +1,21 @@
+name: mypy lint
+
+on: push
+
+jobs:
+  mypy:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v5
+
+      - name: install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' 
+
+      - name: installing mypy 
+        run: pip install --no-cache-dir -r requirements.txt
+
+      - name: linting with mypy
+        run: mypy .
