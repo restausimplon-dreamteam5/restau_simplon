@@ -8,10 +8,15 @@ from sqlmodel import select
 
 from app.deps import SessionDep
 from app.models.models import Role, User
-from app.routes.login import (extract_token_data,
-                              insufficient_permissions_exception)
-from app.schemas.schemas import (ClientCreate, TokenData, UserCreate, UserOut,
-                                 UserPatch, UserPost)
+from app.routes.login import extract_token_data, insufficient_permissions_exception
+from app.schemas.schemas import (
+    ClientCreate,
+    TokenData,
+    UserCreate,
+    UserOut,
+    UserPatch,
+    UserPost,
+)
 
 router = APIRouter(prefix="/users", tags=["User"])
 
