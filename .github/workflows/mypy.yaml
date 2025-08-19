@@ -1,6 +1,6 @@
 name: mypy lint
 
-on: [push]
+on: push
 
 jobs:
   mypy:
@@ -10,7 +10,9 @@ jobs:
         uses: action/checkout@v5
 
       - name: requirements
-        uses: pip install -r requirements.txt
-        
+        uses: |
+          pip install -r requirements.txt
+
       - name: run mypy
-        uses: mypy .
+        uses: |
+          mypy .
