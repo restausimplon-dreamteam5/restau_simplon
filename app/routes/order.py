@@ -1,15 +1,19 @@
-from fastapi import APIRouter, HTTPException, status, Depends
-from typing import Annotated
-from sqlmodel import Session, select
-from app.models.models import Order, OrderDetail, MenuItem, OrderStatus
-from app.schemas.schemas import OrderCreate, OrderOut, OrderDetailCreate, OrderDetailOut, OrderWithDetailsOut, OrderStatusUpdate, TokenData 
-from app.deps import SessionDep
-from app.routes.login import extract_token_data, insufficient_permissions_exception
-from decimal import Decimal
-from sqlalchemy import func
 from datetime import date
+from decimal import Decimal
+from typing import Annotated
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
+from sqlmodel import Session, select
+
+from app.deps import SessionDep
+from app.models.models import MenuItem, Order, OrderDetail, OrderStatus
+from app.routes.login import (extract_token_data,
+                              insufficient_permissions_exception)
+from app.schemas.schemas import (OrderCreate, OrderDetailCreate,
+                                 OrderDetailOut, OrderOut, OrderStatusUpdate,
+                                 OrderWithDetailsOut, TokenData)
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 

@@ -1,19 +1,17 @@
 from logging.config import fileConfig
 
-from sqlalchemy import create_engine, engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
-
+from sqlalchemy import create_engine, engine_from_config, pool
 from sqlmodel import SQLModel
 
 try:
-    from app.models.models import User, MenuItem
+    from app.models.models import MenuItem, User
 except:
     pass
 
 import os
 import sys
+
 import dotenv
 
 dotenv.load_dotenv()
