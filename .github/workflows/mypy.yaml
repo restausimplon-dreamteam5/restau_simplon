@@ -9,8 +9,8 @@ jobs:
       - name: checkout
         uses: action/checkout@v5
 
-      - name: installing requirements
-        run: pip install -r ./requirements.txt
+      - name: installing mypy
+        run: pip install --no-cache-dir -r mypy
 
       - name: linting with mypy
         run: mypy .
