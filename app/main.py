@@ -6,7 +6,7 @@ from app.routes import login, menu_item, order, roles, user
 
 dotenv.load_dotenv()
 
-# TODO: vérifier la présence de toutes les clés 
+# TODO: vérifier la présence de toutes les clés
 
 app = FastAPI()
 
