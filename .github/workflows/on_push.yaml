@@ -99,7 +99,12 @@ jobs:
         run: pip install --no-cache-dir -r requirements.txt
 
       - name: Extension du PYTHONPATH
-        run: export PYTHONPATH=${PYTHONPATH}:${pwd}
+        run: |
+          echo ${pwd}
+          export PYTHONPATH=${PYTHONPATH}:${pwd}
+          echo ${PYTHONPATH}
 
       - name: Lancement des tests unitaires
-        run: pytest tests/units/
+        run: |
+          echo ${PYTHONPATH}
+          pytest tests/units/
