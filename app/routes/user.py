@@ -47,7 +47,8 @@ def get_all_users(
 
     users = session.exec(select(User).offset(offset).limit(limit)).all()
 
-    return users
+    users_out = [UserOut(**user.model_dump()) for user in users]
+    return users_out
 
 
 @router.get("/{id}")
@@ -60,7 +61,8 @@ def get_user_by_id(
         raise insufficient_permissions_exception
 
     try:
-        return session.exec(select(User).where(User.id == id)).one()
+        user_db = session.exec(select(User).where(User.id == id)).one()
+        return UserOut(**user_db.model_dump())
     except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -88,7 +90,8 @@ def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
         session.commit()
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    return user_db
+
+    return UserOut(**user_db.model_dump())
 
 
 @router.post("/")
@@ -104,8 +107,8 @@ def new_user(
 
 @router.post("/client")
 def new_client_account(new_client: ClientCreate, session: SessionDep) -> UserOut:
-    new_client = UserCreate(**new_client.model_dump(), roles=["client"])
-    return insert_user(new_client, session)
+    new_user = UserCreate(**new_client.model_dump(), roles=["client"])
+    return insert_user(new_user, session)
 
 
 @router.patch("/{id}")
@@ -155,7 +158,7 @@ def partial_update_user(
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    return user_db
+    return UserOut(**user_db.model_dump())
 
 
 @router.put("/{id}")
@@ -194,7 +197,7 @@ def update_user(
         session.commit()
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    return user_db
+    return UserOut(**user_db.model_dump())
 
 
 @router.delete("/{id}")
