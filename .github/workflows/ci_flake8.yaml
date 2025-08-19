@@ -1,0 +1,17 @@
+name: Flake8 CI
+on:
+  push:
+    branches: [main, dev, "feature/ci_flake8"]
+jobs:
+  test_ci:
+    name: Test CI workflow
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Salutation
+        env:
+          MY_VAR: Salut! Je suis
+          FIRST_NAME: Mona
+          MIDDLE_NAME: The
+          LAST_NAME: Octocat
+        run: |
+          echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
