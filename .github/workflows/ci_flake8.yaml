@@ -20,12 +20,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout du code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Mise en place de python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Installation des dépendances
+      - name: Installation des dépendences
         run: pip install flake8
-      - name: Run tests
+      - name: Exécution de flake8
         run: flake8 ./
