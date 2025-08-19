@@ -15,9 +15,9 @@ from app.schemas.schemas import Token, TokenData
 
 router = APIRouter(prefix="/login", tags=["Login"])
 
-SECRET_KEY = os.getenv("JWT_SECRET")
-ALGORITHM = os.getenv("JWT_ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+SECRET_KEY = os.environ["JWT_SECRET"]
+ALGORITHM = os.environ["JWT_ALGORITHM"]
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
