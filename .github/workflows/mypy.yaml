@@ -1,0 +1,14 @@
+name: mypy lint
+
+on: [push]
+
+jobs:
+  mypy:
+    runs-on: python:slim-3.12
+    steps:
+      - name: checkout
+        uses: action/checkout@v5
+      - name: requirements
+        uses: pip install -r requirements.txt
+      - name: run mypy
+        uses: mypy .

@@ -51,3 +51,6 @@ urllib3==2.5.0
 uvicorn==0.35.0
 watchfiles==1.1.0
 websockets==15.0.1
+mypy==1.17.1
+mypy_extensions==1.1.0
+pathspec==0.12.1
