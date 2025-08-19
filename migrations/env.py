@@ -42,8 +42,6 @@ target_metadata = SQLModel.metadata
 # ... etc.
 
 
-
-
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -57,7 +55,7 @@ def run_migrations_offline() -> None:
 
     """
     url = config.set_main_option("sqlalchemy.url", DB_URI)
-    
+
     naming_convention = {
         "ix": "ix_%(table_name)_%(column_0_label)s",  # Added table_name for more uniqueness
         "uq": "uq_%(table_name)_%(column_0_name)s",
@@ -87,8 +85,8 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    config.set_main_option('sqlalchemy.url', DB_URI)
-    
+    config.set_main_option("sqlalchemy.url", DB_URI)
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

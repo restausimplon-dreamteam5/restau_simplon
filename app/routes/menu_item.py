@@ -8,10 +8,8 @@ from sqlmodel import select
 from app.crud.menu_items import create_menu_item_in_db
 from app.deps import SessionDep
 from app.models.models import MenuCategory, MenuItem
-from app.routes.login import (extract_token_data,
-                              insufficient_permissions_exception)
-from app.schemas.schemas import (MenuItemCreate, MenuItemOut, MenuItemUpdate,
-                                 TokenData)
+from app.routes.login import extract_token_data, insufficient_permissions_exception
+from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate, TokenData
 
 router = APIRouter(prefix="/menu_items", tags=["Menu items"])
 

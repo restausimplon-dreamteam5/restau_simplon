@@ -85,6 +85,7 @@ class OrderStatus(str, Enum):
     completed = "completed"
     cancelled = "cancelled"
 
+
 # Modele commande
 class Order(SQLModel, table=True):
     """Modèle de commande pour la base de données"""
@@ -98,6 +99,7 @@ class Order(SQLModel, table=True):
     user_id: uuid.UUID = Field(foreign_key="user_info.id")
     details: List["OrderDetail"] = Relationship(back_populates="order")
 
+
 # Modele detail commande
 class OrderDetail(SQLModel, table=True):
     """Modèle de détail de commande pour la base de données"""
@@ -106,11 +108,11 @@ class OrderDetail(SQLModel, table=True):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
-    order_id: uuid.UUID | None = Field(default = None, foreign_key="order.id")
+    order_id: uuid.UUID | None = Field(default=None, foreign_key="order.id")
     item_id: uuid.UUID = Field(foreign_key="menu_item.id")
-    
+
     quantity: int = Field(gt=0, default=1)
-    unit_price: Decimal = Field(..., max_digits=8, decimal_places=2) 
+    unit_price: Decimal = Field(..., max_digits=8, decimal_places=2)
 
     # Relation inverse avec Order
     order: Optional[Order] = Relationship(back_populates="details")
