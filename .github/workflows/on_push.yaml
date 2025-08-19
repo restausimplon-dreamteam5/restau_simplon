@@ -100,11 +100,11 @@ jobs:
 
       - name: Extension du PYTHONPATH
         run: |
-          echo ${pwd}
-          export PYTHONPATH=${PYTHONPATH}:${pwd}
-          echo ${PYTHONPATH}
+          echo `pwd`
+          export PYTHONPATH=$PYTHONPATH:`pwd`
+          echo $PYTHONPATH
 
       - name: Lancement des tests unitaires
         run: |
-          echo ${PYTHONPATH}
+          echo $PYTHONPATH
           pytest tests/units/
