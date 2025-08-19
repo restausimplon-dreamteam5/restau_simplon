@@ -16,10 +16,7 @@ from app.schemas.schemas import MenuItemCreate, UserCreate
 sys.path.append(os.getcwd())
 
 dotenv.load_dotenv()
-DB_URI = os.getenv("DB_URI")
-if DB_URI == None:
-    print("DB_URI manquante")
-    sys.exit()
+DB_URI = os.environ["DB_URI"]
 
 engine = create_engine(DB_URI, echo=True)
 
