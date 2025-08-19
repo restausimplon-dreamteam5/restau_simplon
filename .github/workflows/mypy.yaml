@@ -9,10 +9,8 @@ jobs:
       - name: checkout
         uses: action/checkout@v5
 
-      - name: requirements
-        uses: |
-          pip install -r requirements.txt
+      - name: installing requirements
+        run: pip install -r ./requirements.txt
 
-      - name: run mypy
-        uses: |
-          mypy .
+      - name: linting with mypy
+        run: mypy .
