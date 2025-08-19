@@ -3,11 +3,11 @@ on:
   push:
     branches: [main, dev, "feature/ci_flake8"]
 jobs:
-  test_ci:
-    name: Test CI workflow
+  salut:
+    name: Salutation
     runs-on: ubuntu-24.04
     steps:
-      - name: Salutation
+      - name: salut l'ami
         env:
           MY_VAR: Salut! Je suis
           FIRST_NAME: Mona
@@ -15,3 +15,17 @@ jobs:
           LAST_NAME: Octocat
         run: |
           echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
+  flake8:
+    name: Exécution de flake8
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+      - name: Mise en place de python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installation des dépendances
+        run: pip install flake8
+      - name: Run tests
+        run: flake8 ./
