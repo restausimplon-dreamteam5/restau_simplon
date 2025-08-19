@@ -15,7 +15,7 @@ jobs:
           python-version: '3.12' 
 
       - name: installing mypy 
-        run: pip install --no-cache-dir -r mypy
+        run: pip install --no-cache-dir mypy
 
       - name: linting with mypy
         run: mypy .
