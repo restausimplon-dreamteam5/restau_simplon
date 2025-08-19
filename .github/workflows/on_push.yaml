@@ -99,6 +99,6 @@ jobs:
         run: pip install --no-cache-dir -r requirements.txt
 
       - name: Lancement des tests unitaires
-        run: |
-          export PYTHONPATH=$PYTHONPATH:`pwd`
-          pytest tests/units/
+        run: pytest tests/units/
+#          export PYTHONPATH=$PYTHONPATH:`pwd`
+
