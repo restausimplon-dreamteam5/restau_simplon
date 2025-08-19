@@ -3,8 +3,9 @@ import sys
 from decimal import Decimal
 
 import pytest
-from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate
 from pydantic import ValidationError
+
+from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate
 
 sys.path.append(os.getcwd())
 

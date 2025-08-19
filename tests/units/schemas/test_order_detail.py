@@ -1,6 +1,7 @@
 import pytest
-from app.schemas.schemas import OrderDetailCreate
 from pydantic import ValidationError
+
+from app.schemas.schemas import OrderDetailCreate
 
 
 # Test fixture pour un détail de commande valide
