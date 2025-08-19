@@ -98,5 +98,21 @@ jobs:
       - name: Installation des dépendances
         run: pip install --no-cache-dir -r requirements.txt
 
+      - name: Vérification que pytest est installé
+        run: |
+          python - <<'PY'
+import importlib, sys
+try:
+    importlib.import_module("pytest")
+except ImportError:
+    sys.exit(1)
+PY
+        shell: bash
+
+      - name: Installation de pytest si besoin
+        if: failure()
+        run: pip install pytest
+
       - name: Lancement des tests unitaires
-        run: pytest tests/units/ --maxfail=1 -vv
+        run: pytest tests/units --maxfail=1
+
