@@ -1,13 +1,13 @@
-import os
-import sys
+# import os
+# import sys
+
+# sys.path.append(os.getcwd())
 from decimal import Decimal
 
 import pytest
 from pydantic import ValidationError
 
 from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate
-
-sys.path.append(os.getcwd())
 
 
 # Définition d'un article de menu correct et complet

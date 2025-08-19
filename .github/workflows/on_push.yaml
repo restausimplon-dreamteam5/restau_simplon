@@ -84,6 +84,8 @@ jobs:
     name: Exécution des tests unitaires
     needs: [black, isort, flake8, mypy]
     runs-on: ubuntu-24.04
+    env:
+      PYTHONPATH: $PYTHONPATH:${pwd}
     steps:
       - name: Récupération du code
         uses: actions/checkout@v5
@@ -95,6 +97,9 @@ jobs:
 
       - name: Installation des dépendances
         run: pip install --no-cache-dir -r requirements.txt
+
+      - name: Extension du PYTHONPATH
+        run: export PYTHONPATH=${PYTHONPATH}:${pwd}
 
       - name: Lancement des tests unitaires
         run: pytest tests/units/
