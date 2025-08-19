@@ -23,7 +23,6 @@ def correct_menu_item_example() -> dict:
         "stock": 10,
     }
 
-
 @pytest.mark.parametrize(
     "schema",
     [(MenuItemCreate), (MenuItemUpdate), (MenuItemOut)],
