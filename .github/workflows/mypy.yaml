@@ -4,12 +4,17 @@ on: push
 
 jobs:
   mypy:
-    runs-on: python:slim-3.12
+    runs-on: ubuntu-24.04
     steps:
       - name: checkout
         uses: action/checkout@v5
 
-      - name: installing mypy
+      - name: install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' 
+
+      - name: installing mypy 
         run: pip install --no-cache-dir -r mypy
 
       - name: linting with mypy
