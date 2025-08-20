@@ -23,7 +23,12 @@ services:
   migration:
     restart: no
     container_name: restausimplon-migration
-    image: ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1
+    # Mode: construction de l'image
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    # ou mode: utilisation d'une image du registry
+    #image: ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1
     environment:
       # TODO: Créer un utilisateur spécial pour l'application avec les bons droits
       - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -39,12 +44,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    
+
   insert_data:
     profiles: [test]
     restart: no
     container_name: restausimplon-data
-    image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+    # Mode: construction de l'image
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    # ou mode: utilisation d'une image du registry
+    #image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
     environment:
       # Uri séparer mieux
       - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -57,9 +67,14 @@ services:
         condition: service_completed_successfully
     command: python app/database.py
 
-  api: 
+  api:
     container_name: restausimplon-api
-    image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+    # Mode: construction de l'image
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    # ou mode: utilisation d'une image du registry
+    # image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
     restart: unless-stopped
     ports:
       - ${LOCAL_API_PORT}:8000
