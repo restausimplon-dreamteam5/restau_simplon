@@ -29,11 +29,12 @@ jobs:
       - name: Lancement des tests à travers docker compose
         run: docker compose -f compose.test.yaml --profile test up --build -d
 
-      - name: ee
-        run: docker build -f integration.Dockerfile -t tests .
+      # - name: ee
+      #   run: docker build -f integration.Dockerfile -t tests .
 
       - name: eea
-        run: docker run --network -e API_URL=http://restausimplon-api:8000 restau_simplon_restausimplon-network tests
+        run: docker compose -f compose.test.yaml run tests-integration
+
 
       - name: Nettoyage des conteneurs
         if: always()
