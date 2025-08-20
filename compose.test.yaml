@@ -98,7 +98,6 @@ services:
     #TODO: healthcheck
 
   tests-integration:
-
     container_name: tests-api
     restart: no
     profiles: [ test ]
