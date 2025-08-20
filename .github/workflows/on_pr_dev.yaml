@@ -29,17 +29,25 @@ jobs:
       - name: Lancement du Docker compose
         run: docker compose -f compose.test.yaml up -d
 
+      - name: Affichage (test0)
+        if: always()
+        run: curl --retry 5 --retry-delay 5 http://localhost:8000
+
+      - name: Affichage (test1)
+        if: always()
+        run: curl --retry 5 --retry-delay 5 0.0.0.0:8000
+
       - name: Affichage (test2)
         if: always()
-        run: curl 127.0.0.1:8000
+        run: curl --retry 5 --retry-delay 5 127.0.0.1:8000
 
       - name: Affichage (test3)
         if: always()
-        run: curl api:8000
+        run: curl --retry 5 --retry-delay 5 api:8000
 
       - name: Affichage (test4)
         if: always()
-        run: curl restausimplon-api:8000/
+        run: curl --retry 5 --retry-delay 5 restausimplon-api:8000/
 
       - name: Nettoyage des conteneurs
         if: always()
