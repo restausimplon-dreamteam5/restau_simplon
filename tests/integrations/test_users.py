@@ -3,5 +3,6 @@ import urllib.request
 
 
 def test_site_available():
-    status_code = urllib.request.urlopen(os.environ["API_URL"]).getcode()
+    print(os.environ["API_URL"])
+    status_code = urllib.request.urlopen(f"{os.environ["API_URL"]}/docs").getcode()
     assert status_code == 200

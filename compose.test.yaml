@@ -112,7 +112,7 @@ services:
     networks:
       - restausimplon-network
     environment:
-      - API_URL=http://${restausimplon-api}:8000
+      - API_URL=http://restausimplon-api:8000
     deploy:
       resources:
         limits:
