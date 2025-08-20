@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - dev
-      - feature/exploration-ci
 
 jobs:
   #######
@@ -27,10 +26,10 @@ jobs:
       - name: Récupération du code
         uses: actions/checkout@v5
 
-      - name: Setup environement
+      - name: Mise en place de l'environnement
         run: docker compose -f compose.test.yaml up --build -d
 
-      - name: Lancement des tests à travers docker compose
+      - name: Lancement des tests
         run: docker compose -f compose.test.yaml run tests-integration
 
       - name: Nettoyage des conteneurs
