@@ -30,10 +30,14 @@ jobs:
         run: docker compose -f compose.test.yaml --profile test up --build -d
 
       # - name: ee
-      #   run: docker build -f integration.Dockerfile -t tests .
+      #   run: |
+      #     docker build -f integration.Dockerfile -t tests .
+      #     docker run --network bla {nom_conteneur}
 
       - name: eea
-        run: docker compose -f compose.test.yaml run tests-integration
+        run: |
+          docker network connect restau_simplon_restausimplon-network tests-api
+          docker compose -f compose.test.yaml run tests-integrations
 
 
       - name: Nettoyage des conteneurs
