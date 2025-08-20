@@ -37,7 +37,7 @@ jobs:
       - name: eea
         run: |
           docker network connect restau_simplon_restausimplon-network tests-api
-          docker compose -f compose.test.yaml run tests-integrations
+          docker compose -f compose.test.yaml run tests-integration
 
 
       - name: Nettoyage des conteneurs
