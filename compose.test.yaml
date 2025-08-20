@@ -114,7 +114,8 @@ services:
         limits:
           cpus: 1
           memory: 512M
-    command: pytest tests/integrations/
+    depends_on:
+      - insert_data: service_completed_successfully
 
 networks:
   restausimplon-network:

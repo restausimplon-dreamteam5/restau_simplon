@@ -16,3 +16,5 @@ COPY --chown=appuser:appuser pytest.ini .
 COPY --chown=appuser:appuser tests/ tests/
 
 EXPOSE 8000
+
+CMD pytest tests/integrations/

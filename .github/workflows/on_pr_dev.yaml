@@ -27,9 +27,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Lancement des tests à travers docker compose
-        run: |
-          docker compose -f compose.test.yaml --profile test up --build -d
-          docker compose -f compose.test.yaml run tests-integration
+        run: docker compose -f compose.test.yaml --profile test up --build --exit-code-from tests-integration --abort-on-container-exit
 
       # - name: ee
       #   run: |
