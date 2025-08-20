@@ -46,7 +46,7 @@ services:
         condition: service_healthy
 
   insert_data:
-    profiles: [ test, donotstart ]
+    profiles: [ test ]
     restart: no
     container_name: restausimplon-data
     # Mode: construction de l'image
@@ -100,7 +100,7 @@ services:
   tests-integration:
     container_name: tests-api
     restart: no
-    profiles: [ test, donotstart ]
+    profiles: [ test ]
     build:
       context: .
       dockerfile: integration.Dockerfile
