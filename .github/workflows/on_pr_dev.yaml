@@ -1,0 +1,18 @@
+name: Tests d'intégration
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  #######
+  setup:
+    name: Set up de l'environnement
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Lancement du Docker compose
+        run: docker compose -f compose.test.yaml up
