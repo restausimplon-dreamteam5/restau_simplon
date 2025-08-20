@@ -115,7 +115,8 @@ services:
           cpus: 1
           memory: 512M
     depends_on:
-      - insert_data: service_completed_successfully
+      insert_data:
+        condition: service_completed_successfully
 
 networks:
   restausimplon-network:
