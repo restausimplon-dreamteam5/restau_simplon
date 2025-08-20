@@ -98,17 +98,13 @@ services:
     #TODO: healthcheck
 
   tests-integration:
+
     container_name: tests-api
     restart: no
     profiles: [ test ]
     build:
       context: .
       dockerfile: integration.Dockerfile
-    depends_on:
-      api:
-        condition: service_started
-      insert_data:
-        condition: service_completed_successfully
     networks:
       - restausimplon-network
     environment:
