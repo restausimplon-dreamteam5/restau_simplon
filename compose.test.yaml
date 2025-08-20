@@ -104,20 +104,18 @@ services:
     build:
       context: .
       dockerfile: integration.Dockerfile
-    depends_on:
-      api:
-        condition: service_started
-      insert_data:
-        condition: service_completed_successfully
     networks:
       - restausimplon-network
     environment:
-      - API_URL=http://${restausimplon-api}:8000
+      - API_URL=http://restausimplon-api:8000
     deploy:
       resources:
         limits:
           cpus: 1
           memory: 512M
+    depends_on:
+      insert_data:
+        condition: service_completed_successfully
 
 networks:
   restausimplon-network:
