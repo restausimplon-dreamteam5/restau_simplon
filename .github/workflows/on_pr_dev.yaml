@@ -22,7 +22,6 @@ jobs:
       POSTGRES_DB: test_db
       POSTGRES_PORT: 5432
       LOCAL_DB_PORT: 5432
-      API_URL: http://restausimplon-api:8000
     steps:
       - name: Récupération du code
         uses: actions/checkout@v5
@@ -34,7 +33,7 @@ jobs:
         run: docker build -f integration.Dockerfile -t tests .
 
       - name: eea
-        run: docker run --network restau_simplon_restausimplon-network tests
+        run: docker run --network -e API_URL=http://restausimplon-api:8000 restau_simplon_restausimplon-network tests
 
       - name: Nettoyage des conteneurs
         if: always()
