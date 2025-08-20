@@ -10,22 +10,6 @@ jobs:
   setup:
     name: Set up de l'environnement
     runs-on: ubuntu-24.04
-    steps:
-      - name: Récupération du code
-        uses: actions/checkout@v5
-
-      - name: Lancement du Docker compose
-        run: |
-          docker compose -f compose.test.yaml up -d
-          curl localhost:8000/
-
-      - name: Affichage (test)
-        run: curl localhost:8000/
-
-      - name: Nettoyage des conteneurs
-        if: always()
-        run: docker compose -f compose.test.yaml down
-
     env:
       JWT_SECRET: 09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
       JWT_ALGORITHM: HS256
@@ -38,3 +22,25 @@ jobs:
       POSTGRES_DB: test_db
       POSTGRES_PORT: 5432
       LOCAL_DB_PORT: 5432
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Lancement du Docker compose
+        run: docker compose -f compose.test.yaml up -d
+
+      - name: Affichage (test1)
+        run: curl 0.0.0.0:8000
+
+      - name: Affichage (test2)
+        run: curl 127.0.0.1:8000
+
+      - name: Affichage (test3)
+        run: curl api:8000
+
+      - name: Affichage (test4)
+        run: curl restausimplon-api:8000/
+
+      - name: Nettoyage des conteneurs
+        if: always()
+        run: docker compose -f compose.test.yaml down
