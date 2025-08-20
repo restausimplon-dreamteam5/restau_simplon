@@ -17,10 +17,10 @@ jobs:
       - name: Lancement du Docker compose
         run: |
           docker compose -f compose.test.yaml up -d
-          curl http://localhost:8000/
+          curl localhost:8000/
 
       - name: Affichage (test)
-        run: curl http://localhost:8000/
+        run: curl localhost:8000/
 
       - name: Nettoyage des conteneurs
         if: always()
