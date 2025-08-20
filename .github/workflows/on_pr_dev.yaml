@@ -31,19 +31,19 @@ jobs:
 
       - name: Affichage (test1)
         if: always()
-        run: docker exec restausimplon-api curl --retry 5 --retry-delay 5 localhost:8000
+        run: docker exec restausimplon-api wget localhost:8000
 
       - name: Affichage (test2)
         if: always()
-        run: docker exec restausimplon-api curl --retry 5 --retry-delay 5 http://localhost:8000
+        run: docker exec restausimplon-api wget http://localhost:8000
 
       - name: Affichage (test3)
         if: always()
-        run: docker exec restausimplon-api curl --retry 5 --retry-delay 5 restausimplon-api:8000
+        run: docker exec restausimplon-api wget restausimplon-api:8000
 
       - name: Affichage (test4)
         if: always()
-        run: docker exec restausimplon-api curl --retry 5 --retry-delay 5 http://restausimplon-api:8000
+        run: docker exec restausimplon-api wget http://restausimplon-api:8000
 
       - name: Nettoyage des conteneurs
         if: always()
