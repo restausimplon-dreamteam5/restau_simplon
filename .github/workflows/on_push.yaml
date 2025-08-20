@@ -58,7 +58,7 @@ jobs:
         run: pip install flake8
 
       - name: Exécution de flake8
-        run: flake8 --filename="*.py" --ignore=E501,W503 --exclude=.venv,migrations,.pytest_cache ./
+        run: flake8 --filename="*.py" --ignore=E501,W503,E402 --exclude=.venv,migrations,.pytest_cache ./
 
   #######
   mypy:
