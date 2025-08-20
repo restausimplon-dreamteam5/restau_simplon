@@ -27,17 +27,19 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Lancement des tests à travers docker compose
-        run: docker compose -f compose.test.yaml --profile test up --build -d
+        run: |
+          docker compose -f compose.test.yaml --profile test up --build -d
+          docker compose -f compose.test.yaml run tests-integration
 
       # - name: ee
       #   run: |
       #     docker build -f integration.Dockerfile -t tests .
       #     docker run --network bla {nom_conteneur}
 
-      - name: eea
-        run: |
-          docker network connect restau_simplon_restausimplon-network tests-api
-          docker compose -f compose.test.yaml run tests-integration
+      # - name: eea
+      #   run: |
+      #     docker network connect restau_simplon_restausimplon-network tests-api
+
 
 
       - name: Nettoyage des conteneurs
