@@ -26,24 +26,8 @@ jobs:
       - name: Récupération du code
         uses: actions/checkout@v5
 
-      - name: Lancement du Docker compose
-        run: docker compose -f compose.test.yaml up -d
-
-      - name: Affichage (test1)
-        if: always()
-        run: docker exec restausimplon-api wget localhost:8000
-
-      - name: Affichage (test2)
-        if: always()
-        run: docker exec restausimplon-api wget http://localhost:8000
-
-      - name: Affichage (test3)
-        if: always()
-        run: docker exec restausimplon-api wget restausimplon-api:8000
-
-      - name: Affichage (test4)
-        if: always()
-        run: docker exec restausimplon-api wget http://restausimplon-api:8000
+      - name: Lancement des tests à travers docker compose
+        run: docker compose -f compose.test.yaml --profile test up --build
 
       - name: Nettoyage des conteneurs
         if: always()
