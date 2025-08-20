@@ -15,7 +15,7 @@ services:
     networks:
       - restausimplon-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,7 +46,7 @@ services:
         condition: service_healthy
 
   insert_data:
-    profiles: [test]
+    profiles: [ test ]
     restart: no
     container_name: restausimplon-data
     # Mode: construction de l'image
@@ -85,7 +85,6 @@ services:
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
     networks:
       - restausimplon-network
-      - outside
     depends_on:
       db:
         condition: service_healthy
@@ -96,23 +95,35 @@ services:
         limits:
           cpus: 1
           memory: 512M
+    #TODO: healthcheck
 
+  tests-integration:
+    container_name: tests-api
+    restart: no
+    profiles: [ test ]
+    build:
+      context: .
+      dockerfile: integration.Dockerfile
+    depends_on:
+      api:
+        condition: service_started
+      insert_data:
+        condition: service_completed_successfully
+    networks:
+      - restausimplon-network
+    environment:
+      - API_URL=http://${restausimplon-api}:8000
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 512M
 
 networks:
   restausimplon-network:
     driver: bridge
-  outside:
 
 volumes:
   restausimplon-data:
 
 
-
-
-
-
-
-
-
-
-    

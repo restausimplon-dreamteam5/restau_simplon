@@ -1,7 +1,9 @@
-import json
 import os
-import random
 import sys
+
+sys.path.append(os.getcwd())
+import json
+import random
 
 import bcrypt
 import dotenv
@@ -12,8 +14,6 @@ from app.crud.order import create_order_in_db
 from app.crud.user_info import create_user_info_in_db
 from app.models.models import MenuItem, Order, OrderDetail, OrderStatus, Role, User
 from app.schemas.schemas import MenuItemCreate, UserCreate
-
-sys.path.append(os.getcwd())
 
 dotenv.load_dotenv()
 DB_URI = os.environ["DB_URI"]
