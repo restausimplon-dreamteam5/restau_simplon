@@ -1,9 +1,10 @@
 import requests
+import os
 
 
 def test_read_menu_item_by_name():
     # Act: Exécution de la route testée
-    req = requests.get("http://localhost:8000/menu_items/name/Bruschetta")
+    req = requests.get(f"{os.environ["API_URL"]}/menu_items/name/Bruschetta")
 
     # Assert: Évaluation de la conformité du résultat
     assert req.status_code == 200
@@ -18,7 +19,7 @@ def test_read_menu_item_by_name():
 
 def test_read_menu_category():
     # Act: Exécution de la fonction testée
-    req = requests.get("http://localhost:8000/menu_items/category/starter")
+    req = requests.get(f"{os.environ["API_URL"]}/menu_items/category/starter")
 
     # Assert: Évaluation de la conformité du résultat
     assert req.status_code == 200
