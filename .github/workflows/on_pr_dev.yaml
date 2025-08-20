@@ -16,11 +16,16 @@ jobs:
 
       - name: Lancement du Docker compose
         run: |
-          docker compose -f compose.test.yaml up
+          docker compose -f compose.test.yaml -d up
           curl http://localhost:8000/
 
       - name: Affichage (test)
         run: curl http://localhost:8000/
+
+      - name: Nettoyage des conteneurs
+        if: always()
+        run: docker compose -f compose.test.yaml down
+
     env:
       JWT_SECRET: 09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
       JWT_ALGORITHM: HS256
