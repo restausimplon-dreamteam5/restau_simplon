@@ -7,7 +7,7 @@ import random
 
 import bcrypt
 import dotenv
-from sqlmodel import Session, SQLModel, create_engine, select
+from sqlmodel import Session, create_engine, select
 
 from app.crud.menu_items import create_menu_item_in_db
 from app.crud.order import create_order_in_db
