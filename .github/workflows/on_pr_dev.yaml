@@ -26,8 +26,11 @@ jobs:
       - name: Récupération du code
         uses: actions/checkout@v5
 
-      - name: Lancement des tests à travers docker compose
-        run: docker compose -f compose.test.yaml --profile test up --build -d
+      - name: Mise en place de l'environnement
+        run: docker compose -f compose.test.yaml up --build -d
+
+      - name: Lancement des tests
+        run: docker compose -f compose.test.yaml run tests-integration
 
       - name: Nettoyage des conteneurs
         if: always()

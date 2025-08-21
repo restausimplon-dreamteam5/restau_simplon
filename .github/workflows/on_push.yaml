@@ -99,4 +99,5 @@ jobs:
         run: pip install --no-cache-dir -r requirements.txt
 
       - name: Lancement des tests unitaires
-        run: pytest tests/units/ --maxfail=1 -vv
+        run: pytest tests/units --maxfail=1
+
