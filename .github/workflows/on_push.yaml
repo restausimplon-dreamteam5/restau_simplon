@@ -1,0 +1,103 @@
+name: Qualité de code
+
+on: push
+
+jobs:
+  #######
+  black:
+    name: Exécution de black
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Mise en place de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installation de black
+        run: pip install black
+
+      - name: Lancement de black (check only)
+        run: black . --check
+
+  #######
+  isort:
+    name: Exécution de isort
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Mise en place de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installation de isort
+        run: pip install isort
+
+      - name: Lancement isort (check only)
+        run: isort . --check-only --profile black
+
+  #######
+  flake8:
+    name: Exécution de flake8
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Mise en place de python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installation de flake8
+        run: pip install flake8
+
+      - name: Exécution de flake8
+        run: flake8 --filename="*.py" --ignore=E501,W503,E402 --exclude=.venv,migrations,.pytest_cache ./
+
+  #######
+  mypy:
+    name: Exécution de mypy
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Installation de python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installation des dépendances
+        run: pip install --no-cache-dir -r requirements.txt
+
+      - name: Lancement de mypy
+        run: mypy .
+
+  #######
+  unit-tests:
+    name: Exécution des tests unitaires
+    needs: [black, isort, flake8, mypy]
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONPATH: $PYTHONPATH:${pwd}
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v5
+
+      - name: Installation de python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installation des dépendances
+        run: pip install --no-cache-dir -r requirements.txt
+
+      - name: Lancement des tests unitaires
+        run: pytest tests/units --maxfail=1
+

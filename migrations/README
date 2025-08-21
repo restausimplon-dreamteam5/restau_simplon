@@ -1,0 +1,10 @@
+Le dossier `versions` contient les différents scripts de
+migrations de la base de données organisés par ordre
+chronologique de leur création.
+
+L'ordre d'éxecution de ces scripts pour retrouver une
+structure de base de données à jour est identique.
+
+/!\ En cas de perte de la base de données, ces scripts
+ne permettent pas de récupérer les données, ils portent
+uniquement sur la structure de la BDD /!\

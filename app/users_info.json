@@ -1,0 +1,165 @@
+[
+  {
+    "first_name": "Noémi",
+    "surname": "Verdier",
+    "phone": "0150755307",
+    "email": "noémi.verdier@example.com",
+    "password": "pass7039",
+    "address": "567, rue Patricia Pottier, 23903 Ledoux",
+    "roles": [
+      "staff"
+    ]
+  },
+  {
+    "first_name": "Simone",
+    "surname": "Aubert",
+    "phone": "0019741023",
+    "email": "simone.aubert@example.com",
+    "password": "pass8585",
+    "address": "13, avenue Seguin, 19449 Allard",
+    "roles": [
+      "staff"
+    ]
+  },
+  {
+    "first_name": "Stéphane",
+    "surname": "Girard",
+    "phone": "0290919384",
+    "email": "stéphane.girard@example.com",
+    "password": "pass4544",
+    "address": "78, chemin Guillet, 63445 MaceVille",
+    "roles": [
+      "staff"
+    ]
+  },
+  {
+    "first_name": "William",
+    "surname": "Lombard",
+    "phone": "0776501891",
+    "email": "william.lombard@example.com",
+    "password": "pass1985",
+    "address": "boulevard Antoinette Bodin, 23419 Chevalier",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Virginie",
+    "surname": "Dumas",
+    "phone": "0670904285",
+    "email": "virginie.dumas@example.com",
+    "password": "pass9252",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Michel",
+    "surname": "Ledoux",
+    "phone": "0630898637",
+    "email": "michel.ledoux@example.com",
+    "password": "pass6672",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Victor",
+    "surname": "Dijoux",
+    "phone": "0899804897",
+    "email": "victor.dijoux@example.com",
+    "password": "pass2957",
+    "address": "51, avenue Barbe, 76604 Sainte Yves",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Lucie",
+    "surname": "Regnier",
+    "phone": "0640704965",
+    "email": "lucie.regnier@example.com",
+    "password": "pass9389",
+    "address": "3, rue de Moulin, 59302 Blot-sur-Perrier",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Laetitia",
+    "surname": "Dijoux",
+    "phone": "0552085515",
+    "email": "laetitia.dijoux@example.com",
+    "password": "pass3297",
+    "address": "3, rue Cousin, 39196 Hardydan",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Maggie",
+    "surname": "Gimenez",
+    "phone": "0517436844",
+    "email": "maggie.gimenez@example.com",
+    "password": "pass1463",
+    "address": "90, rue Jacquot, 07126 Marchand",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Émilie",
+    "surname": "Gaudin",
+    "phone": "0219375263",
+    "email": "émilie.gaudin@example.com",
+    "password": "pass6114",
+    "address": "69, rue François Michel, 93887 Ribeiro",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Julie",
+    "surname": "Boutin",
+    "phone": "0213460889",
+    "email": "julie.boutin@example.com",
+    "password": "pass1295",
+    "address": "1, boulevard de Peltier, 16197 Saint Jacqueline",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Zoé",
+    "surname": "Leclercq",
+    "phone": "0456065834",
+    "email": "zoé.leclercq@example.com",
+    "password": "pass9077",
+    "address": "568, chemin Charles, 31758 Saint Suzanne",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Gabriel",
+    "surname": "Lebreton",
+    "phone": "0819467816",
+    "email": "gabriel.lebreton@example.com",
+    "password": "pass6705",
+    "address": "879, boulevard de De Sousa, 62429 RuizBourg",
+    "roles": [
+      "client"
+    ]
+  },
+  {
+    "first_name": "Adrienne",
+    "surname": "Hoareau",
+    "phone": "0263453965",
+    "email": "adrienne.hoareau@example.com",
+    "password": "pass7654",
+    "address": "232, rue Suzanne Pons, 27708 Berthelot",
+    "roles": [
+      "client"
+    ]
+  }
+]

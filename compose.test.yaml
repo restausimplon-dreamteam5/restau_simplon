@@ -1,0 +1,127 @@
+services:
+
+  db:
+    container_name: restausimplon-db
+    image: postgres:17.5-alpine3.22
+    ports:
+      - ${LOCAL_DB_PORT}:${POSTGRES_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    volumes:
+      - restausimplon-data:/var/lib/postgresql/data
+    networks:
+      - restausimplon-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    restart: no
+    container_name: restausimplon-migration
+    # Mode: construction de l'image
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    # ou mode: utilisation d'une image du registry
+    #image: ghcr.io/restausimplon-dreamteam5/restau-migration:0.0.1
+    environment:
+      # TODO: Créer un utilisateur spécial pour l'application avec les bons droits
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
+      # L'uri séparer aurait été user friendlier
+      # - DB_PROTOCOL=postgresql+psycopg
+      # - DB_USER=${POSTGRES_USER}
+      # - DB_PASSWORD=${POSTGRES_PASSWORD}
+      # - DB_HOST=db
+      # - DB_PORT=${POSTGRES_PORT}
+      # - DB_DATABASE=${POSTGRES_DB}
+    networks:
+      - restausimplon-network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  insert_data:
+    profiles: [ test, data ]
+    restart: no
+    container_name: restausimplon-data
+    # Mode: construction de l'image
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    # ou mode: utilisation d'une image du registry
+    #image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+    environment:
+      # Uri séparer mieux
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    networks:
+      - restausimplon-network
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    command: python app/database.py
+
+  api:
+    container_name: restausimplon-api
+    # Mode: construction de l'image
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    # ou mode: utilisation d'une image du registry
+    # image: ghcr.io/restausimplon-dreamteam5/restausimplon-app:0.0.1
+    restart: unless-stopped
+    ports:
+      - ${LOCAL_API_PORT}:8000
+    environment:
+      - DB_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@restausimplon-db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    networks:
+      - restausimplon-network
+    depends_on:
+      db:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 512M
+    #TODO: healthcheck
+
+  tests-integration:
+    container_name: tests-api
+    restart: no
+    profiles: [ test ]
+    build:
+      context: .
+      dockerfile: integration.Dockerfile
+    networks:
+      - restausimplon-network
+    environment:
+      - API_URL=http://restausimplon-api:8000
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 512M
+    depends_on:
+      insert_data:
+        condition: service_completed_successfully
+
+networks:
+  restausimplon-network:
+    driver: bridge
+
+volumes:
+  restausimplon-data:
+
+

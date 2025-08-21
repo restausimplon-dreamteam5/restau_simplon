@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Base de données
+**/*.db
+user_info_generator.py
+
+# Tous les fichiers environnement
+*.env
+not_working*
+*.save
