@@ -1,8 +1,13 @@
-from typing import Annotated
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import Annotated
+
 import bcrypt
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
+
+from app.deps import SessionDep
+from app.models.models import Role, User
 from app.routes.login import extract_token_data, insufficient_permissions_exception
 from app.schemas.schemas import (
     ClientCreate,
@@ -12,9 +17,6 @@ from app.schemas.schemas import (
     UserPatch,
     UserPost,
 )
-from app.models.models import Role, User
-from app.deps import SessionDep
-from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(prefix="/users", tags=["User"])
 
@@ -24,7 +26,7 @@ def find_corresponding_roles(roles: list[str], session: SessionDep):
     for role in roles:
         try:
             res.append(session.exec(select(Role).where(Role.role == role)).one())
-        except:
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Role '{role}' n'existe pas",
@@ -45,7 +47,8 @@ def get_all_users(
 
     users = session.exec(select(User).offset(offset).limit(limit)).all()
 
-    return users
+    users_out = [UserOut(**user.model_dump()) for user in users]
+    return users_out
 
 
 @router.get("/{id}")
@@ -58,8 +61,9 @@ def get_user_by_id(
         raise insufficient_permissions_exception
 
     try:
-        return session.exec(select(User).where(User.id == id)).one()
-    except:
+        user_db = session.exec(select(User).where(User.id == id)).one()
+        return UserOut(**user_db.model_dump())
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
@@ -86,7 +90,8 @@ def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
         session.commit()
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    return user_db
+
+    return UserOut(**user_db.model_dump())
 
 
 @router.post("/")
@@ -102,8 +107,8 @@ def new_user(
 
 @router.post("/client")
 def new_client_account(new_client: ClientCreate, session: SessionDep) -> UserOut:
-    new_client = UserCreate(**new_client.model_dump(), roles=["client"])
-    return insert_user(new_client, session)
+    new_user = UserCreate(**new_client.model_dump(), roles=["client"])
+    return insert_user(new_user, session)
 
 
 @router.patch("/{id}")
@@ -124,7 +129,7 @@ def partial_update_user(
     user_db = None
     try:
         user_db = session.exec(select(User).where(User.id == id)).one()
-    except:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     user_salt = user_db.salt.encode("utf-8")
@@ -153,7 +158,7 @@ def partial_update_user(
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    return user_db
+    return UserOut(**user_db.model_dump())
 
 
 @router.put("/{id}")
@@ -169,7 +174,7 @@ def update_user(
     user_db = None
     try:
         user_db = session.exec(select(User).where(User.id == id)).one()
-    except:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     # Sécurisation du mot de passe
@@ -192,7 +197,7 @@ def update_user(
         session.commit()
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    return user_db
+    return UserOut(**user_db.model_dump())
 
 
 @router.delete("/{id}")
@@ -206,7 +211,7 @@ def delete_user(
 
     try:
         user_to_delete = session.exec(select(User).where(User.id == id)).one()
-    except:
+    except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     session.delete(user_to_delete)

@@ -1,11 +1,12 @@
 # Import
 import uuid
-from sqlmodel import Field, SQLModel, Relationship, Column, Enum as smEnum
-from typing import Optional, List
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from datetime import datetime
+from typing import List, Optional
+
 from pydantic import EmailStr
+from sqlmodel import Field, Relationship, SQLModel
 
 
 # User
@@ -63,12 +64,6 @@ class MenuItem(SQLModel, table=True):
     name: str = Field(..., unique=True, index=True, max_length=100)
     price: Decimal = Field(..., max_digits=8, decimal_places=2)
     category: MenuCategory = Field(...)
-    # category: MenuCategory = Field(
-    #     sa_column=Column(
-    #         smEnum(MenuCategory, name="category", create_type=True),
-    #         nullable=False,
-    #     ),
-    # )
     description: str | None = Field(None)
     stock: int = Field(default=0, ge=0)
 
@@ -81,6 +76,7 @@ class OrderStatus(str, Enum):
     confirmed = "confirmed"
     completed = "completed"
     cancelled = "cancelled"
+
 
 # Modele commande
 class Order(SQLModel, table=True):
@@ -95,6 +91,7 @@ class Order(SQLModel, table=True):
     user_id: uuid.UUID = Field(foreign_key="user_info.id")
     details: List["OrderDetail"] = Relationship(back_populates="order")
 
+
 # Modele detail commande
 class OrderDetail(SQLModel, table=True):
     """Modèle de détail de commande pour la base de données"""
@@ -103,11 +100,11 @@ class OrderDetail(SQLModel, table=True):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
-    order_id: uuid.UUID | None = Field(default = None, foreign_key="order.id")
+    order_id: uuid.UUID | None = Field(default=None, foreign_key="order.id")
     item_id: uuid.UUID = Field(foreign_key="menu_item.id")
-    
+
     quantity: int = Field(gt=0, default=1)
-    unit_price: Decimal = Field(..., max_digits=8, decimal_places=2) 
+    unit_price: Decimal = Field(..., max_digits=8, decimal_places=2)
 
     # Relation inverse avec Order
     order: Optional[Order] = Relationship(back_populates="details")

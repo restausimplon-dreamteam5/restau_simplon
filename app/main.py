@@ -1,10 +1,11 @@
-from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
-from app.routes import menu_item, user, order, login, roles
 import dotenv
+from fastapi import FastAPI
+
+from app.routes import login, menu_item, order, roles, user
+
 dotenv.load_dotenv()
 
-# TODO: vérifier la présence de toutes les clés 
+# TODO: vérifier la présence de toutes les clés
 
 app = FastAPI()
 
