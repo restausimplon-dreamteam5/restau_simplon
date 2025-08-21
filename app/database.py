@@ -7,7 +7,7 @@ import random
 
 import bcrypt
 import dotenv
-from sqlmodel import Session, SQLModel, create_engine, select
+from sqlmodel import Session, create_engine, select
 
 from app.crud.menu_items import create_menu_item_in_db
 from app.crud.order import create_order_in_db
@@ -19,10 +19,6 @@ dotenv.load_dotenv()
 DB_URI = os.environ["DB_URI"]
 
 engine = create_engine(DB_URI, echo=True)
-
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
 
 
 def db_init():
@@ -113,6 +109,9 @@ def db_init_user_info():
 
 
 def create_base_data():
+    """Mise en place d'utilisateurs de controle dans
+    la base de données de test."""
+
     with Session(engine) as session:
         # Nettoyage complet de la table role
         all_roles = session.exec(select(Role)).all()
@@ -144,6 +143,11 @@ def create_base_data():
 
 
 def create_default_admin() -> User:
+    """Création d'un administrateur de test
+
+    Returns:
+        User: L'instance contenant les infos administrateur par défaut
+    """
     admin_role = Role(role="admin")
     admin_password = os.environ["ADMIN_PASSWORD"]
     admin_salt = bcrypt.gensalt()
@@ -163,6 +167,11 @@ def create_default_admin() -> User:
 
 
 def create_a_staff() -> User:
+    """Création d'un employé de test
+
+    Returns:
+        User: L'instance contenant les infos employé par défaut
+    """
     staff_role = Role(role="staff")
     staff_password = "staff"
     staff_salt = bcrypt.gensalt()
@@ -182,6 +191,11 @@ def create_a_staff() -> User:
 
 
 def create_a_client() -> User:
+    """Création d'un client de test
+
+    Returns:
+        User: L'instance contenant les infos client par défaut
+    """
     client_role = Role(role="client")
     client_password = "client"
     client_salt = bcrypt.gensalt()

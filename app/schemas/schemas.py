@@ -161,7 +161,7 @@ class TokenData(SQLModel):
 
 # Article
 class MenuItemCreate(SQLModel):
-    """Modèle de création d'article de menu"""
+    """Modèle de création d'un article de menu"""
 
     name: str = Field(max_length=100)
     price: Decimal = Field(..., max_digits=8, decimal_places=2)
@@ -171,7 +171,7 @@ class MenuItemCreate(SQLModel):
 
 
 class MenuItemUpdate(SQLModel):
-    """Modèle de mise à jour d'article de menu"""
+    """Modèle de mise à jour d'un article de menu"""
 
     name: str | None = Field(default=None, max_length=100)
     price: Decimal | None = Field(default=None, max_digits=8, decimal_places=2)
@@ -181,7 +181,7 @@ class MenuItemUpdate(SQLModel):
 
 
 class MenuItemOut(SQLModel):
-    """Modèle de création d'article de menu"""
+    """Modèle de récupération d'un article de menu"""
 
     id: uuid.UUID
     name: str
@@ -193,14 +193,49 @@ class MenuItemOut(SQLModel):
 
 # Detail commande
 class OrderDetailCreate(SQLModel):
-    """Schéma d’entrée pour un article dans une commande"""
+    """
+    **Schéma d’entrée** pour une **ligne d’article** dans une commande.
+
+    **Utilisation**
+    - Inclus dans `OrderCreate.items`.
+
+    **Contraintes**
+    - `quantity` > **0** (par défaut **1**).
+
+    Attributes:
+        item_id (UUID): **Identifiant** de l’article (`MenuItem.id`).
+        quantity (int): **Quantité** commandée (> 0).
+
+    Example:
+        {
+          "item_id": "d5a6b3f1-8f4a-4c25-9c91-6a2e4ee9c1a2",
+          "quantity": 2
+        }
+    """
 
     item_id: UUID
     quantity: int = Field(default=1, gt=0)
 
 
 class OrderDetailOut(SQLModel):
-    """Schéma de sortie pour un article dans une commande"""
+    """
+    **Schéma de sortie** pour une **ligne d’article** d’une commande.
+
+    **Notes**
+    - `unit_price` est le **prix unitaire au moment de la commande** (type `Decimal`).
+
+    Attributes:
+        item_id (UUID): **Identifiant** de l’article.
+        quantity (int): **Quantité** commandée.
+        unit_price (Decimal): **Prix unitaire** (devise du système, ex. EUR).
+
+    Example:
+        {
+          "item_id": "d5a6b3f1-8f4a-4c25-9c91-6a2e4ee9c1a2",
+          "quantity": 2,
+          "unit_price": "12.90"
+        }
+    """
 
     item_id: UUID
     quantity: int
@@ -208,8 +243,28 @@ class OrderDetailOut(SQLModel):
 
 
 class OrderOut(SQLModel):
-    """Schéma de sortie pour une commande
-    Contient les informations de la commande une fois créée ou consultée
+    """
+    **Schéma de sortie** pour une **commande** (sans les lignes).
+
+    **Contenu**
+    - Métadonnées de la commande (**id**, **user_id**, **order_date**, **status**).
+    - Montant total **calculé**: `total_amount = Σ(quantity × unit_price)`.
+
+    Attributes:
+        id (UUID): **Identifiant** de la commande.
+        user_id (UUID): **Identifiant** du client.
+        order_date (datetime): **Date/heure** de création (ISO 8601).
+        status (OrderStatus): **Statut** de la commande (`pending`, `confirmed`, `completed`, `cancelled`).
+        total_amount (Decimal): **Montant total** de la commande.
+
+    Example:
+        {
+          "id": "b1a9d0e7-0d73-4e76-b5e6-0f3b1c7a9c2f",
+          "user_id": "c4e58f9c-0b2f-4a64-9f1e-8e3c1b2d8c11",
+          "order_date": "2025-08-07T10:42:31.123Z",
+          "status": "confirmed",
+          "total_amount": "38.70"
+        }
     """
 
     id: UUID
@@ -220,12 +275,56 @@ class OrderOut(SQLModel):
 
 
 class OrderWithDetailsOut(OrderOut):
+    """
+    **Schéma de sortie** pour une **commande complète** (commande **+** lignes).
+
+    Hérite de **OrderOut** et ajoute:
+    - `items`: liste des **détails** (`OrderDetailOut`).
+
+    Attributes:
+        items (list[OrderDetailOut]): **Lignes** de la commande.
+
+    Example:
+        {
+          "id": "b1a9d0e7-0d73-4e76-b5e6-0f3b1c7a9c2f",
+          "user_id": "c4e58f9c-0b2f-4a64-9f1e-8e3c1b2d8c11",
+          "order_date": "2025-08-07T10:42:31.123Z",
+          "status": "confirmed",
+          "total_amount": "38.70",
+          "items": [
+            {"item_id": "d5a6b3f1-8f4a-4c25-9c91-6a2e4ee9c1a2", "quantity": 2, "unit_price": "12.90"},
+            {"item_id": "a9b1c2d3-4e5f-6789-0123-456789abcdef", "quantity": 1, "unit_price": "12.90"}
+          ]
+        }
+    """
+
     items: list[OrderDetailOut]
 
 
 # Commande
 class OrderCreate(SQLModel):
-    """Schéma pour créer une commande"""
+    """
+    **Schéma d’entrée** pour **créer** une commande.
+
+    **Règles**
+    - Le rôle **`client`** ne peut créer une commande que **pour lui-même** (côté routes).
+    - `items` doit être **non vide** (attendu fonctionnellement).
+
+    Attributes:
+        user_id (UUID): **Identifiant** du client.
+        order_date (datetime): **Date/heure** de création (défaut: `datetime.now()`).
+        items (List[OrderDetailCreate]): **Lignes** de commande.
+
+    Example:
+        {
+          "user_id": "c4e58f9c-0b2f-4a64-9f1e-8e3c1b2d8c11",
+          "order_date": "2025-08-07T10:40:00Z",
+          "items": [
+            {"item_id": "d5a6b3f1-8f4a-4c25-9c91-6a2e4ee9c1a2", "quantity": 2},
+            {"item_id": "a9b1c2d3-4e5f-6789-0123-456789abcdef", "quantity": 1}
+          ]
+        }
+    """
 
     user_id: UUID
     order_date: datetime = Field(default_factory=datetime.now)
@@ -233,8 +332,21 @@ class OrderCreate(SQLModel):
 
 
 class OrderStatusUpdate(SQLModel):
-    """Schéma pour mettre à jour le statut d'une commande
-    Permet de changer le statut d'une commande existante
+    """
+    **Schéma d’entrée** pour **mettre à jour** le statut d’une commande.
+
+    **Transitions autorisées** (voir logique des routes):
+    - `pending` → `confirmed` **ou** `cancelled`
+    - `confirmed` → `completed` **ou** `cancelled`
+    - `completed` **ou** `cancelled` → *(aucune transition autorisée)*
+
+    Attributes:
+        new_status (OrderStatus): **Nouveau statut** souhaité.
+
+    Example:
+        {
+          "new_status": "confirmed"
+        }
     """
 
     new_status: OrderStatus

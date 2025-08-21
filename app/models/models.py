@@ -82,7 +82,7 @@ class MenuItem(SQLModel, table=True):
 
 # Commande
 class OrderStatus(str, Enum):
-    "Énumération des statuts de commande"
+    """Statuts possibles d’une commande : pending, confirmed, completed, cancelled."""
 
     pending = "pending"
     confirmed = "confirmed"
@@ -92,7 +92,7 @@ class OrderStatus(str, Enum):
 
 # Modele commande
 class Order(SQLModel, table=True):
-    """Modèle de commande pour la base de données"""
+    """Commande : client (user_id), date, statut. Lignes via `details`."""
 
     __tablename__ = "order"
 
@@ -106,7 +106,7 @@ class Order(SQLModel, table=True):
 
 # Modele detail commande
 class OrderDetail(SQLModel, table=True):
-    """Modèle de détail de commande pour la base de données"""
+    """Ligne de commande : article, quantité (>0), prix unitaire (snapshot au jour J)."""
 
     __tablename__ = "order_detail"
 

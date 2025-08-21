@@ -4,14 +4,19 @@ from app.models.models import Order, OrderDetail
 
 
 def create_order_detail_in_db(session: Session, order_detail_db: OrderDetail) -> bool:
-    """Création d'un détail de commande dans la base de données.
+    """Créer une **commande** en base.
+
+    Effectue **add → commit → refresh** sur l'objet fourni.
 
     Args:
-        session (Session): La session communicante avec la BDD
-        order_detail (OrderDetail): Le détail de commande à insérer en base.
+        session (Session): Session de base de données.
+        order_db (Order): Commande à persister.
 
     Returns:
-        bool: Vrai si l'article a été mis en base
+        bool: **True** si l'enregistrement a été **persisté et rafraîchi**.
+
+    Raises:
+        Exception: Toute erreur de persistance SQL/connexion (propagée telle quelle).
     """
     session.add(order_detail_db)
     session.commit()

@@ -8,7 +8,7 @@ def create_menu_item_in_db(session: Session, menu_item_db: MenuItem) -> bool:
 
     Args:
         session (Session): La session communicante avec la BDD
-        menu_item (MenuItem): L'article de menu aà insérer en base.
+        menu_item (MenuItem): L'article de menu à insérer en base.
 
     Returns:
         bool: Vrai si l'article a été mis en base
