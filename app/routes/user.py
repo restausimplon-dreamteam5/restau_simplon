@@ -21,7 +21,19 @@ from app.schemas.schemas import (
 router = APIRouter(prefix="/users", tags=["User"])
 
 
-def find_corresponding_roles(roles: list[str], session: SessionDep):
+def find_corresponding_roles(roles: list[str], session: SessionDep) -> list[Role]:
+    """Renvoie les entrés en base de données des roles passé en paramètres.
+
+    Args:
+    * roles (list[str]): list des roles (ex: ["admin", "staff"])
+    * session (SessionDep): connexion à la base de données
+
+    Raises:
+    * HTTPException: si le role n'existe pas
+
+    Returns:
+    * list[Role]: les roles de la base de données
+    """
     res = []
     for role in roles:
         try:
@@ -41,13 +53,26 @@ def get_all_users(
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ) -> list[UserOut]:
+    """Renvoie tous les utilisateurs selon la pagination.
 
+    Args:
+    * token_data (TokenData): Le token de l'utilisateur effectuant la requête.
+    * offset (int, optional): L'offest pour la pagination. Par défaut 0.
+    * limit (int, optional): Le nombre d'utilisateur maximal retourné. Ne peut pas être supérieur à 100.   Par défaut 100.
+    * session (SessionDep): (interne) connexion à la base de données.
+
+    Raises:
+    * HTTPException: 403 si l'utilisateur n'a pas les permissions nécessaires
+
+    Returns:
+    * list[UserOut]: liste des utilisateurs
+    """
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
     users = session.exec(select(User).offset(offset).limit(limit)).all()
 
-    users_out = [UserOut(**user.model_dump()) for user in users]
+    users_out = [UserOut(**user.model_dump(), roles=user.roles) for user in users]
     return users_out
 
 
@@ -57,12 +82,26 @@ def get_user_by_id(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> UserOut:
+    """Renvoie l'utilisateur correspondant à l'id.
+
+    Args:
+    * id (uuid.UUID): l'id de l'utilisateur recherché
+    * session (SessionDep): (interne) connexion à la base de données
+    * token_data (TokenData): le token de l'utilisateur effectuant la requête
+
+    Raises:
+    * HTTPException: 403 si l'utilisateur n'a pas les permissions nécessaires. L'utilisateur doit être admin ou l'utilisateur concerné.
+    * HTTPException: 404 si l'id n'a pas de correspondance.
+
+    Returns:
+    * UserOut: L'utilisateur concerné.
+    """
     if not token_data.has_role("admin") and not token_data.is_user(id):
         raise insufficient_permissions_exception
 
     try:
         user_db = session.exec(select(User).where(User.id == id)).one()
-        return UserOut(**user_db.model_dump())
+        return UserOut(**user_db.model_dump(), roles=user_db.roles)
     except Exception:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -91,7 +130,7 @@ def insert_user(new_user: UserCreate, session: SessionDep) -> UserOut:
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    return UserOut(**user_db.model_dump())
+    return UserOut(**user_db.model_dump(), roles=user_db.roles)
 
 
 @router.post("/")
@@ -100,6 +139,19 @@ def new_user(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> UserOut:
+    """Créer un nouvel utilisateur
+
+    Args:
+    * new_user (UserCreate): l'utilisateur à créer
+    * session (SessionDep): (interne) connexion à la base de données
+    * token_data (TokenData): le token de l'utilisateur effectuant la requête
+
+    Raises:
+    * HTTPException: 403 si l'utilisateur n'a pas les permissions nécessaires. L'utilisateur doit être admin.
+
+    Returns:
+    * UserOut: L'utilisateur qui vient d'être créé.
+    """
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
     return insert_user(new_user, session)
@@ -107,6 +159,15 @@ def new_user(
 
 @router.post("/client")
 def new_client_account(new_client: ClientCreate, session: SessionDep) -> UserOut:
+    """Créer un nouveau compte client.
+
+    Args:
+    * new_client (ClientCreate): Le nouveau client.
+    * session (SessionDep): (interne) connexion à la base de données.
+
+    Returns:
+    * UserOut: L'utilisateur qui vient d'être créé.
+    """
     new_user = UserCreate(**new_client.model_dump(), roles=["client"])
     return insert_user(new_user, session)
 
@@ -118,6 +179,21 @@ def partial_update_user(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> UserOut:
+    """Mets à jour certains champs d'un utilsateur.
+
+    Args:
+    * id (uuid.UUID): Id de l'utilisateur concerné.
+    * new_user (UserPatch): Les champs utilisateur à modifier.
+    * session (SessionDep): (interne) connexion à la base de données.
+    * token_data (TokenData): le token de l'utilisateur effectuant la requête.
+
+    Raises:
+    * HTTPException: 403 si l'utilisateur n'a pas les permissions nécessaires. L'utilisateur doit être admin ou être l'utilisateur concerné. Un utilisateur non admin ne peut pas modifier ses rôles.
+    * HTTPException: 404 si l'id n'a pas de correspondance.
+
+    Returns:
+        UserOut: L'utilisateur mis à jour
+    """
 
     if not token_data.has_role("admin") and not token_data.is_user(id):
         raise insufficient_permissions_exception
@@ -158,7 +234,7 @@ def partial_update_user(
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    return UserOut(**user_db.model_dump())
+    return UserOut(**user_db.model_dump(), roles=user_db.roles)
 
 
 @router.put("/{id}")
@@ -168,6 +244,21 @@ def update_user(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> UserOut:
+    """Écrase un utilisateur
+
+    Args:
+    * id (uuid.UUID): Id de l'utilisateur concerné.
+    * new_user (UserPost): Le nouvel utilisateur
+    * session (SessionDep): (interne) connexion à la base de données.
+    * token_data (TokenData): le token de l'utilisateur effectuant la requête.
+
+    Raises:
+    * HTTPException: 403 si l'utilisateur n'a pas les permissions nécessaires. L'utilisateur doit être admin.
+    * HTTPException: 404 si l'id n'a pas de correspondance.
+
+    Returns:
+    * UserOut: L'utilisateur mis à jour
+    """
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
@@ -197,7 +288,7 @@ def update_user(
         session.commit()
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    return UserOut(**user_db.model_dump())
+    return UserOut(**user_db.model_dump(), roles=user_db.roles)
 
 
 @router.delete("/{id}")
@@ -206,6 +297,20 @@ def delete_user(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> bool:
+    """Supprime un utilisateur
+
+    Args:
+    * id (uuid.UUID): Id de l'utilisateur concerné.
+    * session (SessionDep): (interne) connexion à la base de données.
+    * token_data (TokenData): le token de l'utilisateur effectuant la requête.
+
+    Raises:
+    * HTTPException: 403 si l'utilisateur n'a pas les permissions nécessaires. L'utilisateur doit être admin.
+    * HTTPException: 404 si l'id n'a pas de correspondance.
+
+    Returns:
+    * bool: True si l'utilisateur à été supprimer avec succès
+    """
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
