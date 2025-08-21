@@ -1,6 +1,7 @@
-import requests
 import os
+
 import pytest
+import requests
 
 
 # Récupếration du token
