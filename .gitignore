@@ -212,3 +212,4 @@ user_info_generator.py
 
 # Tous les fichiers environnement
 *.env
+not_working*
