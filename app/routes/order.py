@@ -30,19 +30,24 @@ def read_orders_with_details(
     limit: int = 20,
 ) -> list[OrderWithDetailsOut]:
     """
-    Récupération paginée des commandes avec leurs détails.
+    **Récupérer une liste paginée de commandes _avec leurs détails_.**
 
-    * Pagination avec skip et limit
-    * Calcul automatique du montant total
-    * Utilisation la relation Order.details (back_populates)
+    - **Pagination** via `skip` et `limit`.
+    - **Calcul automatique** de `total_amount` = Σ(`quantity × unit_price`).
+    - **Relation** : utilisation de `Order.details` (*back_populates*).
+    - **Accès** : réservé au **rôle `admin`**.
 
     Args:
-        session (SessionDep): Session avec la base de données
-        skip (int): Nombre d'éléments à ignorer (par défaut 0)
-        limit (int): Nombre maximum de résultats à retourner (par défaut 20)
+        session (SessionDep): Session de base de données.
+        token_data (TokenData): Données JWT pour le contrôle d'accès.
+        skip (int): Nombre d'éléments à ignorer (par défaut **0**).
+        limit (int): Nombre maximum de résultats retournés (par défaut **20**).
 
     Returns:
-        list[OrderWithDetailsOut]: Liste des commandes avec leurs détails
+        list[OrderWithDetailsOut]: Liste des commandes avec leurs lignes.
+
+    Raises:
+        HTTPException: **403** si permissions insuffisantes.
     """
 
     # Vérifie que l'utilisateur a bien le rôle "admin"
@@ -82,18 +87,24 @@ def create_order(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> OrderOut:
-    """**Création d'une commande avec plusieurs articles**
+    """**Créer une commande avec plusieurs articles.**
 
-    * Vérifie l'existence de chaque article
-    * Calcule automatiquement le montant total
-    * Enregistre la commande et ses détails
+    - **Vérification** de l'existence de chaque article (`MenuItem`).
+    - **Calcul automatique** du montant total `total_amount` = Σ(`quantity × price`).
+    - **Règle de sécurité** : un utilisateur avec le rôle **`client`** ne peut créer
+      une commande que **pour lui-même**.
 
     Args:
-        order (OrderCreate): Données de la commande (user_id + items)
-        session (SessionDep): Session avec la base de données
+        order (OrderCreate): Données de la commande (**user_id** + **items**).
+        session (SessionDep): Session de base de données.
+        token_data (TokenData): Données JWT pour la vérification des rôles/identité.
 
     Returns:
-        OrderOut: Commande enregistrée avec son montant total
+        OrderOut: Commande enregistrée (id, user_id, date, statut, **total_amount**).
+
+    Raises:
+        HTTPException: **404** si un article est introuvable.
+        HTTPException: **403** si permissions insuffisantes (client ≠ propriétaire).
     """
 
     # Si c’est un client, il ne peut commander que pour lui-même
@@ -143,20 +154,23 @@ def get_orders_by_user(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> list[OrderOut]:
-    """**Récupération des commandes d’un utilisateur**
+    """
+    **Récupérer l’historique des commandes d’un utilisateur.**
 
-    * Affiche l’historique des commandes associées à un user_id
-    * Calcule automatiquement le montant total pour chaque commande
+    - **Calcul** du `total_amount` pour chaque commande via les lignes associées.
+    - **Accès** : autorisé au **propriétaire** (`user_id`) ou aux rôles **`admin`** / **`employee`**.
 
     Args:
-        user_id (UUID): Identifiant unique du client
-        session (SessionDep): Session de base de données
-
-    Raises:
-        HTTPException: Si aucune commande n'est trouvé
+        user_id (UUID): Identifiant unique du client.
+        session (SessionDep): Session de base de données.
+        token_data (TokenData): Données JWT pour le contrôle d'accès.
 
     Returns:
-        list[OrderOut]: Liste des commandes du client
+        list[OrderOut]: Liste des commandes (sans détails ligne).
+
+    Raises:
+        HTTPException: **404** si aucune commande n'est trouvée.
+        HTTPException: **403** si permissions insuffisantes.
     """
 
     # Seul le client concerné OU le staff peuvent accéder
@@ -200,20 +214,23 @@ def get_order_by_id(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> OrderWithDetailsOut:
-    """**Récupération d'une commande avec ses détails**
+    """
+    **Récupérer une commande par son ID, _avec ses détails_.**
 
-    * À partir de son ID unique
-    * Calcule automatiquement le montant total de la commande
+    - **Calcul automatique** du montant total de la commande.
+    - **Accès** : autorisé au **propriétaire** ou aux rôles **`admin`** / **`employee`**.
 
     Args:
-        order_id (UUID): L'identifiant unique de la commande
-        session (SessionDep): La session communicante avec la BDD
-
-    Raises:
-        HTTPException: Si la commande est introuvable
+        order_id (UUID): Identifiant unique de la commande.
+        session (SessionDep): Session de base de données.
+        token_data (TokenData): Données JWT pour le contrôle d'accès.
 
     Returns:
-        OrderWithDetailsOut: Les informations complètes de la commande
+        OrderWithDetailsOut: La commande complète (lignes incluses).
+
+    Raises:
+        HTTPException: **404** si la commande est introuvable.
+        HTTPException: **403** si permissions insuffisantes.
     """
 
     order = session.get(Order, order_id)
@@ -251,20 +268,24 @@ def get_orders_by_date(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> list[OrderOut]:
-    """**Récupération des commandes par date**
+    """
+    **Récupérer les commandes passées à une date précise.**
 
-    * Retourne toutes les commandes passées à une date précise (format : YYYY-MM-DD)
-    * Calcule automatiquement le montant total de chaque commande
+    - **Format de date** : `YYYY-MM-DD`.
+    - **Calcul** du `total_amount` pour chaque commande.
+    - **Accès** : réservé aux rôles **`admin`** / **`employee`**.
 
     Args:
-        query_date (date): La date recherchée (ex: 2025-08-07)
-        session (SessionDep): La session communicante avec la BDD
-
-    Raises:
-        HTTPException: Si aucune commande n'est trouvée pour cette date
+        query_date (date): Date recherchée (ex. **2025-08-21**).
+        session (SessionDep): Session de base de données.
+        token_data (TokenData): Données JWT pour le contrôle d'accès.
 
     Returns:
-        list[OrderOut]: Liste des commandes avec leurs montants totaux
+        list[OrderOut]: Commandes du jour (sans détails ligne).
+
+    Raises:
+        HTTPException: **404** si aucune commande n'est trouvée pour cette date.
+        HTTPException: **403** si permissions insuffisantes.
     """
 
     # Restriction d'accès : seuls admin/employee peuvent voir toutes les commandes d'une date
@@ -308,24 +329,29 @@ def update_order_status(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> dict:
-    """**Mise à jour du statut d'une commande avec transitions contrôlées**
+    """
+    **Mise à jour du statut d'une commande avec *transitions contrôlées*.**
 
-    * Ne permet que certaines transitions entre les statuts :
-        - `pending` → `confirmed` ou `cancelled`
-        - `confirmed` → `completed` ou `cancelled`
-        - `completed` ou `cancelled` → (aucune transition autorisée)
-    * Empêche toute transition non autorisée via une exception
+    **Transitions autorisées :**
+    - `pending` → `confirmed` **ou** `cancelled`
+    - `confirmed` → `completed` **ou** `cancelled`
+    - `completed` **ou** `cancelled` → *(aucune transition autorisée)*
+
+    - **Accès** : réservé aux rôles **`admin`** / **`employee`**.
 
     Args:
-        order_id (UUID): L'identifiant unique de la commande
-        status_update (OrderStatusUpdate): Le nouveau statut souhaité
-        session (SessionDep): La session communicante avec la BDD
-
-    Raises:
-        HTTPException: Si la commande n'est pas trouvée ou si la transition est interdite
+        order_id (UUID): Identifiant unique de la commande.
+        status_update (OrderStatusUpdate): Nouveau statut souhaité (**new_status**).
+        session (SessionDep): Session de base de données.
+        token_data (TokenData): Données JWT pour le contrôle d'accès.
 
     Returns:
-        dict: Message de confirmation du changement de statut
+        dict: Message de confirmation (ex. `{"message": "Statut mis à jour : confirmed"}`).
+
+    Raises:
+        HTTPException: **404** si la commande est introuvable.
+        HTTPException: **400** si la transition n'est pas autorisée.
+        HTTPException: **403** si permissions insuffisantes.
     """
 
     # Vérification des rôles
