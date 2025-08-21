@@ -1,37 +1,46 @@
-from fastapi import APIRouter, HTTPException, status, Depends
-from typing import Annotated
-from sqlmodel import Session, select
-from app.models.models import Order, OrderDetail, MenuItem, OrderStatus
-from app.schemas.schemas import OrderCreate, OrderOut, OrderDetailCreate, OrderDetailOut, OrderWithDetailsOut, OrderStatusUpdate, TokenData 
-from app.deps import SessionDep
-from app.routes.login import extract_token_data, insufficient_permissions_exception
-from decimal import Decimal
-from sqlalchemy import func
 from datetime import date
+from decimal import Decimal
+from typing import Annotated
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
+from sqlmodel import select
+
+from app.deps import SessionDep
+from app.models.models import MenuItem, Order, OrderDetail, OrderStatus
+from app.routes.login import extract_token_data, insufficient_permissions_exception
+from app.schemas.schemas import (
+    OrderCreate,
+    OrderDetailOut,
+    OrderOut,
+    OrderStatusUpdate,
+    OrderWithDetailsOut,
+    TokenData,
+)
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
+
 
 @router.get("/with_details")
 def read_orders_with_details(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
     skip: int = 0,
-    limit: int = 20
+    limit: int = 20,
 ) -> list[OrderWithDetailsOut]:
     """
     Récupération paginée des commandes avec leurs détails.
-    
+
     * Pagination avec skip et limit
     * Calcul automatique du montant total
     * Utilisation la relation Order.details (back_populates)
-    
+
     Args:
         session (SessionDep): Session avec la base de données
         skip (int): Nombre d'éléments à ignorer (par défaut 0)
         limit (int): Nombre maximum de résultats à retourner (par défaut 20)
-    
+
     Returns:
         list[OrderWithDetailsOut]: Liste des commandes avec leurs détails
     """
@@ -40,9 +49,7 @@ def read_orders_with_details(
     if not token_data.has_role("admin"):
         raise insufficient_permissions_exception
 
-    orders = session.exec(
-        select(Order).offset(skip).limit(limit)
-    ).all()
+    orders = session.exec(select(Order).offset(skip).limit(limit)).all()
 
     results = []
     for order in orders:
@@ -50,21 +57,21 @@ def read_orders_with_details(
 
         items = [
             OrderDetailOut(
-                item_id=d.item_id,
-                quantity=d.quantity,
-                unit_price=d.unit_price
+                item_id=d.item_id, quantity=d.quantity, unit_price=d.unit_price
             )
             for d in order.details
         ]
 
-        results.append(OrderWithDetailsOut(
-            id=order.id,
-            user_id=order.user_id,
-            order_date=order.order_date,
-            status=order.status,
-            total_amount=total_amount,
-            items=items
-        ))
+        results.append(
+            OrderWithDetailsOut(
+                id=order.id,
+                user_id=order.user_id,
+                order_date=order.order_date,
+                status=order.status,
+                total_amount=total_amount,
+                items=items,
+            )
+        )
 
     return results
 
@@ -73,7 +80,7 @@ def read_orders_with_details(
 def create_order(
     order: OrderCreate,
     session: SessionDep,
-    token_data: Annotated[TokenData, Depends(extract_token_data)]
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> OrderOut:
     """**Création d'une commande avec plusieurs articles**
 
@@ -88,16 +95,16 @@ def create_order(
     Returns:
         OrderOut: Commande enregistrée avec son montant total
     """
-   
+
     # Si c’est un client, il ne peut commander que pour lui-même
     if token_data.has_role("client") and not token_data.is_user(order.user_id):
         raise insufficient_permissions_exception
-    
+
     total_amount = Decimal("0.00")
 
     # Création de la commande
     order_db = Order(user_id=order.user_id)
-    session.add(order_db)  
+    session.add(order_db)
 
     # Création des détails de commande
     for item in order.items:
@@ -105,14 +112,14 @@ def create_order(
         if not item_db:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Article ID {item.item_id} non trouvé."
+                detail=f"Article ID {item.item_id} non trouvé.",
             )
 
         detail = OrderDetail(
             order=order_db,
             item_id=item.item_id,
             quantity=item.quantity,
-            unit_price=item_db.price
+            unit_price=item_db.price,
         )
 
         total_amount += item.quantity * item_db.price
@@ -126,7 +133,7 @@ def create_order(
         user_id=order_db.user_id,
         order_date=order_db.order_date,
         status=order_db.status,
-        total_amount=total_amount
+        total_amount=total_amount,
     )
 
 
@@ -134,7 +141,7 @@ def create_order(
 def get_orders_by_user(
     user_id: UUID,
     session: SessionDep,
-    token_data: Annotated[TokenData, Depends(extract_token_data)]
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> list[OrderOut]:
     """**Récupération des commandes d’un utilisateur**
 
@@ -153,17 +160,18 @@ def get_orders_by_user(
     """
 
     # Seul le client concerné OU le staff peuvent accéder
-    if not token_data.has_role("admin") and not token_data.has_role("employee") and not token_data.is_user(user_id):
+    if (
+        not token_data.has_role("admin")
+        and not token_data.has_role("employee")
+        and not token_data.is_user(user_id)
+    ):
         raise insufficient_permissions_exception
-    
-    orders = session.exec(
-        select(Order).where(Order.user_id == user_id)
-    ).all()
+
+    orders = session.exec(select(Order).where(Order.user_id == user_id)).all()
 
     if not orders:
         raise HTTPException(
-            status_code=404,
-            detail="Aucune commande trouvée pour ce client."
+            status_code=404, detail="Aucune commande trouvée pour ce client."
         )
 
     results = []
@@ -173,13 +181,15 @@ def get_orders_by_user(
             detail.unit_price * detail.quantity for detail in order.details
         )
 
-        results.append(OrderOut(
-            id=order.id,
-            user_id=order.user_id,
-            order_date=order.order_date,
-            status=order.status,
-            total_amount=total_amount
-        ))
+        results.append(
+            OrderOut(
+                id=order.id,
+                user_id=order.user_id,
+                order_date=order.order_date,
+                status=order.status,
+                total_amount=total_amount,
+            )
+        )
 
     return results
 
@@ -188,7 +198,7 @@ def get_orders_by_user(
 def get_order_by_id(
     order_id: UUID,
     session: SessionDep,
-    token_data: Annotated[TokenData, Depends(extract_token_data)]
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> OrderWithDetailsOut:
     """**Récupération d'une commande avec ses détails**
 
@@ -211,17 +221,17 @@ def get_order_by_id(
         raise HTTPException(status_code=404, detail="Commande non trouvée.")
 
     # Vérification : seul le propriétaire de la commande OU le staff peut accéder
-    if not token_data.has_role("admin") and not token_data.has_role("employee") and not token_data.is_user(order.user_id):
+    if (
+        not token_data.has_role("admin")
+        and not token_data.has_role("employee")
+        and not token_data.is_user(order.user_id)
+    ):
         raise insufficient_permissions_exception
-    
+
     total_amount = sum(d.quantity * d.unit_price for d in order.details)
 
     items_out = [
-        OrderDetailOut(
-            item_id=d.item_id,
-            quantity=d.quantity,
-            unit_price=d.unit_price
-        )
+        OrderDetailOut(item_id=d.item_id, quantity=d.quantity, unit_price=d.unit_price)
         for d in order.details
     ]
 
@@ -231,7 +241,7 @@ def get_order_by_id(
         order_date=order.order_date,
         status=order.status,
         total_amount=total_amount,
-        items=items_out
+        items=items_out,
     )
 
 
@@ -239,7 +249,7 @@ def get_order_by_id(
 def get_orders_by_date(
     query_date: date,
     session: SessionDep,
-    token_data: Annotated[TokenData, Depends(extract_token_data)]
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> list[OrderOut]:
     """**Récupération des commandes par date**
 
@@ -260,30 +270,33 @@ def get_orders_by_date(
     # Restriction d'accès : seuls admin/employee peuvent voir toutes les commandes d'une date
     if not token_data.has_role("admin") and not token_data.has_role("employee"):
         raise insufficient_permissions_exception
-    
+
     orders = session.exec(
         select(Order).where(func.date(Order.order_date) == query_date)
     ).all()
 
     if not orders:
         raise HTTPException(
-            status_code=404,
-            detail="Aucune commande trouvée pour cette date."
+            status_code=404, detail="Aucune commande trouvée pour cette date."
         )
 
     results = []
     for order in orders:
         # Calcul du montant total grace a la relation order.details
-        total_amount = sum(detail.unit_price * detail.quantity for detail in order.details)
+        total_amount = sum(
+            detail.unit_price * detail.quantity for detail in order.details
+        )
 
         # Construction de l'objet OrderOut
-        results.append(OrderOut(
-            id=order.id,
-            user_id=order.user_id,
-            order_date=order.order_date,
-            status=order.status,
-            total_amount=total_amount
-        ))
+        results.append(
+            OrderOut(
+                id=order.id,
+                user_id=order.user_id,
+                order_date=order.order_date,
+                status=order.status,
+                total_amount=total_amount,
+            )
+        )
 
     return results
 
@@ -293,7 +306,7 @@ def update_order_status(
     order_id: UUID,
     status_update: OrderStatusUpdate,
     session: SessionDep,
-    token_data: Annotated[TokenData, Depends(extract_token_data)]
+    token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> dict:
     """**Mise à jour du statut d'une commande avec transitions contrôlées**
 
@@ -318,7 +331,7 @@ def update_order_status(
     # Vérification des rôles
     if not token_data.has_role("admin") and not token_data.has_role("employee"):
         raise insufficient_permissions_exception
-    
+
     order = session.get(Order, order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Commande non trouvée.")
@@ -330,13 +343,13 @@ def update_order_status(
         OrderStatus.pending: [OrderStatus.confirmed, OrderStatus.cancelled],
         OrderStatus.confirmed: [OrderStatus.completed, OrderStatus.cancelled],
         OrderStatus.completed: [],
-        OrderStatus.cancelled: []
+        OrderStatus.cancelled: [],
     }
 
     if new_status not in allowed_transitions[current_status]:
         raise HTTPException(
             status_code=400,
-            detail=f"Transition de '{current_status.value}' vers '{new_status.value}' non autorisée."
+            detail=f"Transition de '{current_status.value}' vers '{new_status.value}' non autorisée.",
         )
 
     order.status = new_status
@@ -345,6 +358,3 @@ def update_order_status(
     session.refresh(order)
 
     return {"message": f"Statut mis à jour : {new_status.value}"}
-
-
-    

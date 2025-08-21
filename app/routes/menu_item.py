@@ -1,13 +1,14 @@
-from uuid import UUID
-from fastapi import APIRouter, HTTPException, Query, status, Depends
 from typing import Annotated
-from decimal import Decimal
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import select
-from app.routes.login import extract_token_data, insufficient_permissions_exception
-from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate, TokenData
-from app.models.models import MenuItem, MenuCategory
+
 from app.crud.menu_items import create_menu_item_in_db
 from app.deps import SessionDep
+from app.models.models import MenuCategory, MenuItem
+from app.routes.login import extract_token_data, insufficient_permissions_exception
+from app.schemas.schemas import MenuItemCreate, MenuItemOut, MenuItemUpdate, TokenData
 
 router = APIRouter(prefix="/menu_items", tags=["Menu items"])
 
@@ -59,8 +60,10 @@ def read_menu_items(
 
     **Args**:
     * **session** (*SessionDep*): La session communicante avec la BDD
-    * **offset** (*int*, optional): Décalage pour le premier article à lire. Par défaut: 0.
-    * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées. Par défaut: 100.
+    * **offset** (*int*, optional): Décalage pour le premier article à lire.
+        Par défaut: 0.
+    * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées.
+        Par défaut: 100.
 
     *Returns*:
     * *list[MenuItemOut]*: Liste des informations sortantes

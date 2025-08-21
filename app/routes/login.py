@@ -1,22 +1,22 @@
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-import uuid
+
+import bcrypt
+import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import select
 
 from app.deps import SessionDep
 from app.models.models import User
 from app.schemas.schemas import Token, TokenData
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-import jwt
-import bcrypt
-import os 
 
 router = APIRouter(prefix="/login", tags=["Login"])
 
-SECRET_KEY = os.getenv("JWT_SECRET")
-ALGORITHM = os.getenv("JWT_ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+SECRET_KEY = os.environ["JWT_SECRET"]
+ALGORITHM = os.environ["JWT_ALGORITHM"]
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -53,7 +53,7 @@ def login(
 
     try:
         user = session.exec(select(User).where(User.email == logins.username)).one()
-    except:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Identifiants invalides",
