@@ -65,7 +65,7 @@ def read_menu_items(
     * **limit** (*int* <= 100, optional): Limite du nombre d'articles retournées.
         Par défaut: 100.
 
-    *Returns*:
+    **Returns**:
     * *list[MenuItemOut]*: Liste des informations sortantes
     """
 
@@ -78,7 +78,8 @@ def read_menu_items(
 
 @router.get("/category/{menu_category}")
 def read_menu_category(menu_category: str, session: SessionDep) -> list[MenuItemOut]:
-    """**Récupération des articles de menu**, dont la catégorie est **menu_category**
+    """**Récupération des articles de menu**, dont la catégorie est donnée par
+    **menu_category**
 
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
@@ -119,7 +120,8 @@ def read_menu_category(menu_category: str, session: SessionDep) -> list[MenuItem
 
 @router.get("/name/{menu_item_name}")
 def read_menu_item_by_name(menu_item_name: str, session: SessionDep) -> MenuItemOut:
-    """**Récupération de l'article de menu**, dont le nom est **menu_item_name**
+    """**Récupération de l'article de menu**, dont le nom est donnée par
+    **menu_item_name**
 
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
@@ -149,7 +151,8 @@ def read_menu_item_by_name(menu_item_name: str, session: SessionDep) -> MenuItem
 
 @router.get("/id/{menu_item_id}")
 def read_menu_item_by_id(menu_item_id: UUID, session: SessionDep) -> MenuItemOut:
-    """**Récupération de l'article de menu**, dont l'ID est **menu_item_id**
+    """**Récupération de l'article de menu**, dont l'ID est donnée par
+    **menu_item_id**
 
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
 
@@ -182,7 +185,8 @@ def partial_update_menu_item_by_name(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
-    """**Mise à jour partielle de l'article de menu**, dont le nom est **menu_item_name**
+    """**Mise à jour partielle de l'article de menu**, dont le nom est donnée
+    par **menu_item_name**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemUpdate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
@@ -238,7 +242,8 @@ def partial_update_menu_item_by_id(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
-    """**Mise à jour partielle de l'article de menu**, dont l'ID est **menu_item_id**
+    """**Mise à jour partielle de l'article de menu**, dont l'ID est donnée
+    par **menu_item_id**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemUpdate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
@@ -292,7 +297,8 @@ def update_menu_item_by_name(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
-    """**Mise à jour complète de l'article de menu**, dont le nom est **menu_item_name**
+    """**Mise à jour complète de l'article de menu**, dont le nom est donnée
+    par **menu_item_name**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemCreate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
@@ -339,7 +345,8 @@ def update_menu_item_by_id(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> MenuItemOut:
-    """**Mise à jour complète de l'article de menu**, dont l'ID est **menu_item_id**
+    """**Mise à jour complète de l'article de menu**, dont l'ID est donnée
+    par **menu_item_id**
 
     * Validation des données entrantes grâce au schéma Pydantic **MenuItemCreate**
     * Filtrage des données sortantes grâce au schéma Pydantic **MenuItemOut**
@@ -383,7 +390,8 @@ def delete_menu_item_by_name(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> bool:
-    """**Suppression de l'article de menu**, dont le nom est **menu_item_name**
+    """**Suppression de l'article de menu**, dont le nom est donnée par
+    **menu_item_name**
 
     **Permissions**: admin, staff
 
@@ -422,7 +430,8 @@ def delete_menu_item_by_id(
     session: SessionDep,
     token_data: Annotated[TokenData, Depends(extract_token_data)],
 ) -> bool:
-    """**Suppression de l'article de menu**, dont l'ID est **menu_item_id**
+    """**Suppression de l'article de menu**, dont l'ID est donnée par
+    **menu_item_id**
 
     **Permissions**: admin, staff
 

@@ -104,7 +104,7 @@ class TokenData(SQLModel):
 
 # Article
 class MenuItemCreate(SQLModel):
-    """Modèle de création d'article de menu"""
+    """Modèle de création d'un article de menu"""
 
     name: str = Field(max_length=100)
     price: Decimal = Field(..., max_digits=8, decimal_places=2)
@@ -114,7 +114,7 @@ class MenuItemCreate(SQLModel):
 
 
 class MenuItemUpdate(SQLModel):
-    """Modèle de mise à jour d'article de menu"""
+    """Modèle de mise à jour d'un article de menu"""
 
     name: str | None = Field(default=None, max_length=100)
     price: Decimal | None = Field(default=None, max_digits=8, decimal_places=2)
@@ -124,7 +124,7 @@ class MenuItemUpdate(SQLModel):
 
 
 class MenuItemOut(SQLModel):
-    """Modèle de création d'article de menu"""
+    """Modèle de récupération d'un article de menu"""
 
     id: uuid.UUID
     name: str

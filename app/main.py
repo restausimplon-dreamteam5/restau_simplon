@@ -7,7 +7,7 @@ dotenv.load_dotenv()
 
 # TODO: vérifier la présence de toutes les clés
 
-app = FastAPI()
+app = FastAPI(swagger_ui_parameters={"syntaxHighlight": {"theme": "arta"}})
 
 app.include_router(login.router)
 app.include_router(menu_item.router)
