@@ -15,7 +15,7 @@ import os
 import requests
 
 # Configuration variables
-BASE_URL = f"http://localhost:{os.getenv('LOCAL_API_PORT', '8000')}"
+BASE_URL = os.environ["API_URL"]
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@restau-simplon.com")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "password")
 
