@@ -46,7 +46,7 @@ services:
         condition: service_healthy
 
   insert_data:
-    profiles: [ test ]
+    profiles: [ test, data ]
     restart: no
     container_name: restausimplon-data
     # Mode: construction de l'image
