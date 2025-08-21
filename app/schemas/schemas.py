@@ -12,8 +12,19 @@ from app.models.models import MenuCategory, OrderStatus, Role
 
 
 # User
-# TODO: find out about doc
 class UserCreate(SQLModel):
+    """Informations nécessaire à la création d'un utilisateur
+
+    Attributes:
+    * first_name (str): le prénom. 50 caractères max.
+    * surname (str): le nom. 50 caractères max.
+    * phone (str): le numéro de téléphone. contient seulement 10 chiffres (ex:  0102030405). Pas d'espaces. Pas de code de pays.
+    * address (str, Optional): L'adresse complète rue, code postal et Ville. (ex: 46 rue des michels, 44000, Nantes). 200 caractères max.
+    * email (EmailStr): l'email
+    * password (str): le mot de passe
+    * roles (list[Role]): Les roles de l'utilisateur.
+    """
+
     first_name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
     phone: str = Field(
@@ -27,6 +38,17 @@ class UserCreate(SQLModel):
 
 
 class ClientCreate(SQLModel):
+    """Informations nécessaire à la création d'un nouveau compte client
+
+    Attributes:
+    * first_name (str): le prénom. 50 caractères max.
+    * surname (str): le nom. 50 caractères max.
+    * phone (str): le numéro de téléphone. contient seulement 10 chiffres (ex:  0102030405). Pas d'espaces. Pas de code de pays.
+    * address (str, Optional): L'adresse complète rue, code postal et Ville. (ex: 46 rue des michels, 44000, Nantes). 200 caractères max.
+    * email (EmailStr): l'email
+    * password (str): le mot de passe
+    """
+
     first_name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
     phone: str = Field(
@@ -39,6 +61,18 @@ class ClientCreate(SQLModel):
 
 
 class UserPost(SQLModel):
+    """Informations nécessaire à la modification d'un utilisateur
+
+    Attributes:
+    * first_name (str): le prénom. 50 caractères max.
+    * surname (str): le nom. 50 caractères max.
+    * phone (str): le numéro de téléphone. contient seulement 10 chiffres (ex:  0102030405). Pas d'espaces. Pas de code de pays.
+    * address (str, Optional): L'adresse complète rue, code postal et Ville. (ex: 46 rue des michels, 44000, Nantes). 200 caractères max.
+    * email (EmailStr): l'email.
+    * password (str): le mot de passe.
+    * roles (list[Role]): Les roles de l'utilisateur.
+    """
+
     first_name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
     phone: str = Field(
@@ -52,6 +86,18 @@ class UserPost(SQLModel):
 
 
 class UserPatch(SQLModel):
+    """Informations nécessaire à la modification partielle d'un utilisateur
+
+    Attributes:
+    * first_name (str, Optional): le prénom. 50 caractères max.
+    * surname (str, Optional): le nom. 50 caractères max.
+    * phone (str, Optional): le numéro de téléphone. contient seulement 10 chiffres (ex:  0102030405). Pas d'espaces. Pas de code de pays.
+    * address (str, Optional): L'adresse complète rue, code postal et Ville. (ex: 46 rue des michels, 44000, Nantes). 200 caractères max.
+    * email (EmailStr, Optional): l'email.
+    * password (str, Optional): le mot de passe.
+    * roles (list[Role], Optional): Les roles de l'utilisateur.
+    """
+
     first_name: str | None = Field(default=None, max_length=50)
     surname: str | None = Field(default=None, max_length=50)
     phone: str | None = Field(
@@ -68,9 +114,16 @@ class UserPatch(SQLModel):
 
 
 class UserOut(SQLModel):
-    """
-    Téléphone: numéro de type "0677889910". Pas d'espaces, pas prefix national (+33). Juste 10 numero.
-    Adresse: Adresse complète (ex: 46 rue des michels 44000 Nantes)
+    """Informations de l'utilisateur qui peuvent être publié
+
+    Attributes:
+    * first_name (str): le prénom. 50 caractères max.
+    * surname (str): le nom. 50 caractères max.
+    * phone (str): le numéro de téléphone. contient seulement 10 chiffres (ex:  0102030405). Pas d'espaces. Pas de code de pays.
+    * address (str, Optional): L'adresse complète rue, code postal et Ville. (ex: 46 rue des michels, 44000, Nantes). 200 caractères max.
+    * email (EmailStr): l'email.
+    * created_at (datetime): l'heure de création du compte.
+    * roles (list[Role]): Les roles de l'utilisateur.
     """
 
     id: uuid.UUID
@@ -86,11 +139,15 @@ class UserOut(SQLModel):
 
 
 class Token(SQLModel):
+    """Informations concernant un token"""
+
     access_token: str
     token_type: str
 
 
 class TokenData(SQLModel):
+    """Contenu du token"""
+
     sub: str  # user id
     roles: list[str]
     exp: datetime

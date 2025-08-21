@@ -11,6 +11,8 @@ from sqlmodel import Field, Relationship, SQLModel
 
 # User
 class Permission(SQLModel, table=True):
+    """Table d'association entre le roles et les utilisateurs"""
+
     user_id: uuid.UUID = Field(foreign_key="user_info.id", primary_key=True)
     role_id: uuid.UUID = Field(foreign_key="role.id", primary_key=True)
 
@@ -21,14 +23,26 @@ class Role(SQLModel, table=True):
 
 
 class User(SQLModel, table=True):
+    """Modèle d'un utilisateur
+
+    Attributes:
+    * id (uuid.UUID): l'id de l'utilisateur. Généré automatiquement.
+    * first_name (str): le prénom. 50 caractères max.
+    * surname (str): le nom. 50 caractères max.
+    * phone (str): le numéro de téléphone. contient seulement 10 chiffres (ex:  0102030405). Pas d'espaces. Pas de code de pays.
+    * address (str, Optional): L'adresse complète rue, code postal et Ville. (ex: 46 rue des michels, 44000, Nantes). 200 caractères max.
+    * email (EmailStr): l'email.
+    * password (str): le mot de passe.
+    * salt (str): le sel avec lequel on sale le mot de passe.
+    * created_at (datetime): l'heure de création du compte. Généré automatiquement.
+    * roles (list[Role]): Les roles de l'utilisateur.
+    """
+
     __tablename__ = "user_info"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     first_name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
-    # On a choisi de prendre en charges les numéro de type "0677889910".
-    # Pas d'espaces, pas prefix comme +33
-    # Que des numeros français de 10 caractères
     # TODO: on pourrait verifier les prefix valables 06, 07, 01, 02, 03, 04,05 ...
     # TODO: regarder du côté de pydantic
     # THINK: Est ce que le pattern à besoin d'être la ?
@@ -36,13 +50,11 @@ class User(SQLModel, table=True):
     phone: str = Field(
         min_length=10, max_length=10, schema_extra={"pattern": r"^[0-9]*$"}
     )
-    # Adresse complète comme (46 rue des michels 44000 Nantes)
     address: str | None = Field(max_length=200)
     email: EmailStr = Field(index=True, unique=True, max_length=320)
     password: str
     salt: str
     created_at: datetime = Field(default_factory=datetime.now)
-
     roles: list[Role] = Relationship(link_model=Permission)
 
 

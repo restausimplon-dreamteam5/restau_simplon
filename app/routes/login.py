@@ -50,7 +50,18 @@ def extract_token_data(token: Annotated[str, Depends(oauth2_scheme)]):
 def login(
     logins: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep
 ) -> Token:
+    """Permet à un utilisateur de se connecter.
 
+    Args:
+    * logins (OAuth2PasswordRequestForm): username et password dans un format "application/x-www-form-urlencoded"
+    * session (SessionDep): (interne) connexion à la base donnée
+
+    Raises:
+    * HTTPException: 401 UNAUTHORIZED si username ou password n'ont pas de correspondance
+
+    Returns:
+    * Token: Le token JWT et son type. L'id de l'utilisateur ainsi que ses roles sont stocker dans le payload de l'access token
+    """
     try:
         user = session.exec(select(User).where(User.email == logins.username)).one()
     except Exception:
