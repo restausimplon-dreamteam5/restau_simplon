@@ -17,7 +17,7 @@ import requests
 # Configuration variables
 BASE_URL = os.environ["API_URL"]
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@restau-simplon.com")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "password")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
 
 LOGIN_PATH = "/login"
 MENU_LIST_PATH = "/menu_items"
