@@ -20,6 +20,7 @@ Votre mission consiste à réaliser une API REST complète sous FastAPI pour g
 - Gestion des **commandes** avec suivi du statut au fur et à mesure du traitement
 - **Authentification & Autorisation** à l'aide de jetons JWT
 - **Conteneurisation** avec Docker et Docker Compose
+- **Tests** 
 - **Intégration continue** avec GitHub Actions (qualité de code, tests unitaires et d'intégration)
 
 ## 🍛 Stack technique
@@ -32,6 +33,7 @@ Votre mission consiste à réaliser une API REST complète sous FastAPI pour g
 - **Conteneurisation** : Docker & Docker Compose
 - **Tests unitaires** : Pytest
 - **Tests d'intégration**: Pytest via requests
+- **Qualité du code**: Black, mypy, Flake8, isort
 - **CI/CD** : GitHub Actions
 
 ## 🍔 Installation & Utilisation
@@ -80,7 +82,8 @@ python app/database.py
 ```
 Pour cette étape, n'oubliez pas les variables d'environnement:
 - **ADMIN_EMAIL**
-- **ADMIN_PASSWORD**
+- **ADMIN_PASSWORD**  
+
 Elles servent à définir l'utilisateur *admin* pour les données de tests
 
 ## 🍝 Dockerisation
@@ -110,20 +113,29 @@ docker compose -f compose.prod.yaml up
 
 ## 🥘 Lancement des tests
 
-Une fois l'application lancée, les tests unitaires peuvent être lancée:
+### Tests unitaires
+Les tests unitaires peuvent être lancée avec la commande suivante :
 
 ```bash
 pytest tests/units
 ```
 
-puis les test d'intégration
+### Tests d'intégrations
+Pour lancer les tests d'intégration vous devez avoir un environement prêt (db + api).   
 
+Le plus simple est d'éxécuter le docker compose de test. `compose.test.yaml`
 ```bash
-pytest tests/intégrations
+docker compose -f compose.test.yaml --profile test up --build
 ```
 
 ## 🥙 CI/CD
-
+À chaque `push`, la CI éxécute les tests unitaires et contrôle la qualité du code avec:
+- black 
+- mypy
+- Flake8 
+- isort
+  
+À chaque `pull request` sur la branch `dev`, la CI éxécute les tests d'intégration à l'aide de docker compose de test.
 
 ## 🍕 Arborescence du projet
 
