@@ -54,3 +54,4 @@ websockets==15.0.1
 mypy==1.17.1
 mypy_extensions==1.1.0
 pathspec==0.12.1
+requests==2.32.5
